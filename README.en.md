@@ -125,7 +125,8 @@ Open a Session row's **⋯** menu and choose **Handoff and continue**:
 1. the current Session's mechanical handoff is written immediately;
 2. a new Session is created in the same workspace;
 3. the resume brief is injected and a first prompt is sent, so the new Session
-   replies with a 6-line takeover note and next steps.
+   replies with a 6-line takeover note and next steps. Before replying it reads
+   **all 12 sections of HANDOFF.md and the complete facts.json**, not just the brief.
 
 The new Session does not modify files or run long commands yet; confirm its plan
 before it starts work.
@@ -238,9 +239,11 @@ your `.gitignore`.
 - The old path took about 99s, of which plugin work was under 1s; the rest was
   the model reading ~13KB and generating a ~10KB narrative. The default no
   longer triggers that turn. One-click handoff measured 37ms.
-- The earlier "very slow" one-click run was an 18-minute model task: the new
-  Session was told to start executing the handoff immediately. It now replies
-  with a 6-line takeover note and waits for confirmation.
+- The new Session reads the full HANDOFF.md and facts.json (~9KB, under a
+  second) before replying. The earlier "very slow" one-click run was an
+  18-minute model task: the new Session was told to start executing the
+  handoff immediately. It now replies with a 6-line takeover note and waits
+  for confirmation.
 - `/handoff --narrative` still adds one model turn and is expected to be slow;
   use it only when a model-written summary is needed.
 

@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.3] - 2026-10-29
+
+### Changed
+
+- The one-click takeover now requires the new Session to read the complete
+  `HANDOFF.md` (all 12 sections) and the complete `facts.json` before replying.
+  The 0.2.2 prompt read only sections 0/2/4 and skipped facts.json, which was
+  fast but too lossy for accurate continuation. The reply is still capped at
+  six lines and still does not execute anything before confirmation.
+
 ## [0.2.2] - 2026-10-29
 
 ### Changed
