@@ -26,10 +26,20 @@ test('a document from another task is rejected', () => {
   assert.ok(result.errors.some((error) => error.includes('facts.json taskId')))
 })
 
-test('a draft document is rejected', () => {
+test('a draft document is rejected for resume', () => {
   const result = validateHandoffMatch({ task, frontmatter: { task_id: 'task-1', status: 'draft' }, facts: { taskId: 'task-1' } })
   assert.equal(result.ok, false)
   assert.ok(result.errors.some((error) => error.includes('draft')))
+})
+
+test('read-only access may inspect a draft that still matches its task', () => {
+  const result = validateHandoffMatch({
+    task,
+    frontmatter: { task_id: 'task-1', status: 'draft' },
+    facts: { taskId: 'task-1' },
+    allowDraft: true,
+  })
+  assert.deepEqual(result, { ok: true, errors: [] })
 })
 
 test('index paths outside the selected task are rejected', () => {
