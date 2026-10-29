@@ -102,11 +102,14 @@ test('brief is capped and carries the required fields', () => {
     language: 'zh',
   })
   assert.ok(brief.length <= 2400)
-  assert.ok(brief.includes('[交接续接]'))
-  assert.ok(brief.includes('20261029-1705'))
+  assert.ok(brief.includes('【交接续接】'))
+  assert.ok(brief.includes('ID：20261029-1705'))
+  assert.ok(brief.includes('文档：'))
+  assert.ok(brief.includes('事实：'))
   assert.ok(brief.includes('第一件事：first'))
   assert.ok(brief.includes('HANDOFF.md'))
   assert.ok(brief.includes('进度：80%'))
+  assert.ok(brief.includes('规则：'))
   assert.ok(!brief.includes('undefined'))
 })
 
