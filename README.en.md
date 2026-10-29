@@ -17,7 +17,7 @@ re-discovering the task from a 1000-step conversation.
   and open questions.
 - The Session row's **⋯** menu has **Handoff and continue**: it waits for the
   old Session's model to finish writing, then creates a new Session that reads
-  only that document and replies with a ≤6-line takeover note.
+  only that document and replies with a six-item takeover list.
 - In a new session, `/handoff resume` injects a ≤2400-character resume brief
   into the next message: where the work stands, the full document path, and the
   single first action.
@@ -126,7 +126,7 @@ Open a Session row's **⋯** menu and choose **Handoff and continue**:
 2. the old model turn is allowed to finish (Toast shows progress, up to 4 minutes);
 3. a new Session is created in the same workspace, the brief is injected, and a
    first prompt asks it to read **only HANDOFF.md** (all 12 sections) and reply
-   with the 6-line takeover note.
+   with the six-item takeover list.
 
 The new Session does not modify files or run long commands yet; confirm its plan
 before it starts work.
@@ -138,16 +138,16 @@ Session at the newest document.
 
 The injected brief is a short field block (ID / Source / Size / State /
 Progress / Document / First action / Next / Rules), not a paragraph. The
-automatic prompt specifies both the six reply lines and what each line must
-contain:
+automatic prompt requires six Markdown list items (one per line, so the chat
+view cannot collapse single newlines into one paragraph):
 
 ```text
-[Takeover] taskId + title + what you are taking over (one sentence)
-[State] done/in-progress/blocked; branch/commit/worktree; latest test baseline; doc gaps (1-2 sentences)
-[Next] 1) action + file/command + done criterion 2) … 3) … (max 3)
-[Key file] `path 1 from section 6`, `path 2` (max 2)
-[Verify] `command from section 8` → expected result
-[Confirm] what the user must decide; write "none" if nothing
+- [Takeover] taskId + title + what you are taking over (one sentence)
+- [State] done/in-progress/blocked; branch/commit/worktree; latest test baseline; doc gaps (1-2 sentences)
+- [Next] 1) action + file/command + done criterion 2) … 3) … (max 3)
+- [Key file] `path 1 from section 6`, `path 2` (max 2)
+- [Verify] `command from section 8` → expected result
+- [Confirm] what the user must decide; write "none" if nothing
 ```
 
 If the document is missing or incomplete, say so in [State] and ask in
@@ -261,7 +261,7 @@ instead of guessing by timestamps.
 - One-click handoff waits for that turn before opening the new Session, so the
   new Session never reads a missing or half-written document. The Toast shows
   progress during the wait.
-- The new Session reads one `HANDOFF.md` and replies with a 6-line note; it does
+- The new Session reads one `HANDOFF.md` and replies with a six-item list; it does
   not start a long task.
 
 ## Safety and boundaries
