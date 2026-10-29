@@ -4,6 +4,18 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2026-10-29
+
+### Changed
+
+- The handoff instruction now specifies concrete content for every one of the
+  12 sections (evidence, file map table, failed attempts, executable
+  verification commands, environment values) instead of only listing headings.
+- The new-Session prompt now specifies what each of the six reply lines must
+  contain: task identity, state/branch/test baseline, concrete next actions,
+  up to two key files, command plus expected result, and confirmation
+  questions. Missing/incomplete documents must be reported in the reply.
+
 ## [0.4.0] - 2026-10-29
 
 ### Changed

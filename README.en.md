@@ -137,17 +137,21 @@ a red toast instead of staying silent, and the prompt still points the new
 Session at the newest document.
 
 The injected brief is a short field block (ID / Source / Size / State /
-Progress / Document / Facts / First action / Next / Rules), not a paragraph.
-The automatic prompt requires exactly six reply lines:
+Progress / Document / First action / Next / Rules), not a paragraph. The
+automatic prompt specifies both the six reply lines and what each line must
+contain:
 
 ```text
-[Takeover] what I am taking over
-[State] current state; call out truncated history if any
-[Next] 1) … 2) … 3) …
-[Key file] `path from section 6`
-[Verify] `command from section 8`
-[Confirm] what needs confirmation; write "none" if nothing
+[Takeover] taskId + title + what you are taking over (one sentence)
+[State] done/in-progress/blocked; branch/commit/worktree; latest test baseline; doc gaps (1-2 sentences)
+[Next] 1) action + file/command + done criterion 2) … 3) … (max 3)
+[Key file] `path 1 from section 6`, `path 2` (max 2)
+[Verify] `command from section 8` → expected result
+[Confirm] what the user must decide; write "none" if nothing
 ```
+
+If the document is missing or incomplete, say so in [State] and ask in
+[Confirm]. The first reply does not run commands or modify files.
 
 The action lives only in the three-dot menu — no extra icon on the Session
 header or on the row.
