@@ -227,7 +227,7 @@ ctx.sessionProjections.register({
 | `tool/result` | `{message:{isError, content}, error}`：记录失败摘要（≤300），成功命令计入 `commands` |
 | `workspace/changes` | 记 `{turn, seq}`，生成文档时用 `ctx.workspaceChanges.summary(sessionId, seq)` 补文件清单 |
 
-生成文档时的其它事实**直接读现成投影**：`ctx.sessionProjections.stateOf(session, 'todos' | 'plan' | 'goal' | 'sessionStats' | 'turnOutline' | 'contextPressure')`。所有读取都 `try/catch`，缺服务就降级（对应章节写「无」并在 facts 里记 `unavailable`）。
+生成文档时的其它事实**直接读现成投影**，但必须走 `ctx.get('sessionProjections')` 再 `stateOf(session, 'todos' | 'plan' | 'goal' | 'sessionStats' | 'turnOutline' | 'contextPressure')`：命令处理器所在上下文没有声明 `sessionProjections` 注入，直接写 `ctx.sessionProjections` 会被 Cordis 拒绝（`cannot get property … without inject`），读法错误会让所有投影读成 `undefined`。所有读取都 `try/catch`，缺服务就降级（对应章节写「无」并在 facts 里记 `unavailable`）。
 
 内存上限：users 40×4KB、assistants 12×2KB、commands 40、errors 30、files 200；超限截断并置 `truncated` 标记。
 
