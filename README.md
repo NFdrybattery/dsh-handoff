@@ -6,9 +6,9 @@
 
 ## 功能
 
-- `/handoff` 折叠真实会话事实（步数、改过的文件、shell 命令、失败、todo、goal），**立即**写出完整的 12 节 `HANDOFF.md`（机械版，不等待模型）。
-- 需要模型叙事时执行 `/handoff --narrative`；`facts.json` 里的机械事实始终是权威，不允许臆造。
-- 会话三点菜单里有「交接并继续」：一键交接、自动在本工作区新建会话、载入摘要，并自动生成一条不超过 6 行的接手说明（不直接执行长任务）。
+- `/handoff` 在旧会话后台发送一条交接指令，由当前模型按固定 12 节格式写出 `HANDOFF.md`；不再由插件拼机械版，也不生成 `facts.json`。
+- 交接内容全部在 `HANDOFF.md`：frontmatter 记录任务/来源/规模，正文包含摘要、状态、决策、文件地图、失败、验证和未决问题。
+- 会话三点菜单里有「交接并继续」：等旧会话模型写完文档后自动新建会话，新会话只读取这份文档，并生成不超过 6 行的接手说明（不直接执行长任务）。
 - 新会话执行 `/handoff resume`，会把不超过 2400 字的接续摘要注入到下一条消息：做到哪了、完整文档在哪、第一件事是什么。
 - 默认 800 步时在消息边界插入一条不打断的提醒；之后每 200 步一档、上下文压力单独一档，各提醒一次。
 - 全程本地：文档在 `<工作区>/.dsh/handoff/<taskId>/`，不联网、不起子代理或旁路 LLM 调用；只有你点一键交接时才会新建会话。
@@ -60,11 +60,10 @@ dsh plugin --profile desktop add dsh-handoff
 | `remindAfterSteps` | `800` | 首次提醒步数。 |
 | `remindEverySteps` | `200` | 提醒分档间隔。 |
 | `remindAfterTokens` | `120000` | 上下文 token 提醒线；`0` 关闭。 |
-| `maxUserMessages` | `40` | facts 保留的最近用户消息数。 |
-| `maxAssistantMessages` | `12` | facts 保留的最近助手消息数。 |
-| `maxCommandLog` | `40` | facts 保留的最近 shell 命令数。 |
-| `maxErrors` | `30` | facts 保留的最近失败工具调用数。 |
-| `keepHistory` | `10` | 每个任务保留的 `HANDOFF.md` 历史版本数。 |
+| `maxUserMessages` | `40` | 生成任务元数据时保留的最近用户消息数。 |
+| `maxAssistantMessages` | `12` | 生成任务元数据时保留的最近助手消息数。 |
+| `maxCommandLog` | `40` | 生成任务元数据时保留的最近 shell 命令数。 |
+| `maxErrors` | `30` | 生成任务元数据时保留的最近失败工具调用数。 |
 | `retentionDays` | `1` | 任务最后一次更新超过这么多天就删除整个任务目录；`0` 关闭自动清理。 |
 | `resumeBriefMaxChars` | `2400` | 接续摘要最大字符数。 |
 | `language` | `zh` | 文档语言：`zh` 或 `en`。 |
@@ -79,7 +78,7 @@ dsh plugin --profile desktop add dsh-handoff
 /handoff
 ```
 
-命令会写出 `<工作区>/.dsh/handoff/<taskId>/{HANDOFF.md,facts.json}`，并把文档直接置为可接续的 `pending`。默认是**机械版**：所有章节由事实预填，不等待模型，约 0.1 秒完成。需要当前模型补齐叙事时再加 `--narrative`（会多一轮模型生成，明显更慢）。命令结果里会给出文档路径和步数。查看状态：
+命令只做两件事：在 `<工作区>/.dsh/handoff/<taskId>/` 建好目录，并向当前会话模型发送一条带格式要求的交接指令。模型用 `write` 写出 `HANDOFF.md`；命令本身立即返回，文档需要等这一轮模型结束才可用。等文档写完后再执行 `/handoff resume`，或直接点一键交接。查看状态：
 
 ```text
 /handoff status
@@ -88,15 +87,15 @@ dsh plugin --profile desktop add dsh-handoff
 
 `/handoff update` 是同一动作的显式写法；`/handoff --new` 会在本会话已有任务线时另开一条。
 
-文档共 12 节：60 秒摘要、目标与验收、当前状态、已完成、待办与下一步、关键决策、文件地图、坑与失败、验证方式、环境依赖、未决问题、相关会话。没内容的章节会明确写「无」，不会让模型凭记忆编造；`facts.json` 由插件生成。
+文档共 12 节：60 秒摘要、目标与验收、当前状态、已完成、待办与下一步、关键决策、文件地图、坑与失败、验证方式、环境依赖、未决问题、相关会话。指令要求事实来自当前会话、不臆造、不确定的写进未决问题，并且不写密钥。`HANDOFF.md` 是唯一的内容文件。
 
 ### 一键交接（会话三点菜单）
 
 在左侧会话列表里点某个会话的 **⋯**，选 **「交接并继续」**：
 
-1. 立即生成该会话的机械版交接；
-2. 在同一工作区创建新会话；
-3. 注入交接摘要并自动发出第一条消息，让新会话先给出接手说明和下一步（6 行内）。新会话在回复前会**完整读取 HANDOFF.md 的 12 节和 facts.json**，不会只看摘要。
+1. 向旧会话发送交接指令，模型开始写 `HANDOFF.md`；
+2. 等这一轮模型结束（Toast 显示进度，最多等 4 分钟）；
+3. 在同一工作区创建新会话，注入摘要并自动发出第一条消息，让新会话只读取 `HANDOFF.md` 的 12 节，然后给出 6 行接手说明。
 
 新会话不会立刻改文件或跑长命令；你确认它的计划后再让它继续。第 3 步注摘要用的是 `/handoff resume --latest`，所以工作区里有多条历史 `pending` 任务时也会准确接上刚才这份，不会因为「有多个待接续任务」而卡住；万一摘要注入失败，会用一个红色 Toast 说明，新会话仍会按提示自己读最新文档。
 
@@ -126,16 +125,11 @@ dsh plugin --profile desktop add dsh-handoff
 /handoff resume 20261029-1710-keep-history
 ```
 
-摘要通过 `agent.inject` 放入下一条消息，不唤醒驱动，所以**执行后不会自动出现回复**：再发一条消息（内容随意），模型就会带着摘要开始。任务标记为 `resumed` 并写入 `resume-log.jsonl`；同一会话重复执行会提示「已接手」，加 `--force` 可再次注入。
+摘要通过 `agent.inject` 放入下一条消息，不唤醒驱动，所以**执行后不会自动出现回复**：再发一条消息（内容随意），模型就会带着摘要开始。任务标记为 `resumed` 并记在 `index.json`；同一会话重复执行会提示「已接手」，加 `--force` 可再次注入。
 
 ### 模型工具
 
-| 工具 | 作用 |
-| --- | --- |
-| `handoff_write` | 用模型的叙事渲染完整 `HANDOFF.md`，校验文件地图，更新索引。 |
-| `handoff_read` | 按需读取全文、某一节或机器事实，避免把旧对话整段塞回上下文。 |
-
-两个工具都只写 `<工作区>/.dsh/handoff/`，并明确要求不写入密钥。
+当前版本不再注册 `handoff_write` / `handoff_read`：旧会话直接用 `write` 写 `HANDOFF.md`，新会话直接用 `read` 读它，减少中间格式和额外文件。
 
 ### 归档
 
@@ -159,13 +153,12 @@ dsh plugin --profile desktop remove dsh-handoff
 
 ```text
 <工作区>/.dsh/handoff/
-  index.json                    工作区级索引（带锁）
+  index.json                    工作区级索引（元数据，带锁）
   <taskId>/
-    HANDOFF.md                  人读主文档（YAML frontmatter + 12 节）
-    facts.json                  机器事实（插件生成）
-    history/<stamp>.md          覆盖前的历史版本（keepHistory）
-    resume-log.jsonl            谁在何时接手的记录
+    HANDOFF.md                  唯一内容文件（YAML frontmatter + 12 节）
 ```
+
+旧版本的 `facts.json`、`history/`、`resume-log.jsonl` 会在下一次 `/handoff` 命令时自动删除；内容已经不再依赖它们。
 
 任务 id 为 `<YYYYMMDD-HHmm>[-ascii-slug]`；同一会话复用当前任务 id，除非传 `--new`。接手过某任务的会话再执行 `/handoff`，更新的就是那条被接手的任务线，不会另起一份文档。状态流转：`draft` → `pending` → `resumed`，终态 `archived`。
 
@@ -173,22 +166,21 @@ dsh plugin --profile desktop remove dsh-handoff
 
 **自动清理**：每次执行 `/handoff` 命令时，会先删除最后一次更新超过 `retentionDays`（默认 1 天）的任务目录，并同步从 `index.json` 移除；按 `updatedAt` 计算，删除后不可恢复。设为 `0` 关闭清理。
 
-**载入校验**：`/handoff resume` 会核对 `index.json`、`HANDOFF.md` frontmatter 的 `task_id`、`facts.json` 的 `taskId` 和索引路径，不一致就拒绝注入；`--latest` 使用 `index.latestTaskId`，精确指向刚写完的那条任务，而不是靠时间猜测。
+**载入校验**：`/handoff resume` 只核对 `HANDOFF.md` frontmatter 的 `task_id` 与索引任务 id；不一致、文档不存在或仍是 `draft` 就拒绝注入。`--latest` 使用 `index.latestTaskId`，精确指向刚发送指令的那条任务，而不是靠时间猜测。
 
 ## 工作原理
 
-1. **Host-only 会话投影** `handoffFacts` 折叠已提交的会话事件：轮次、步数、用户/助手文本、工具调用、write/edit 路径、shell 命令、失败、workspace 变更轮次；状态有上限，可 checkpoint。
-2. `/handoff` 读取该投影以及宿主自带的 `sessionStats`、`contextPressure`、`todos`、`goal`、`plan`、`title` 投影，写 `facts.json`，渲染带机械预填的骨架。
-3. 模型调用 `handoff_write`；工具校验必填叙事、检查文件地图（不存在标 `[缺失]`、越界标 `[路径越界]`，不直接失败），渲染最终 markdown，把任务置为 `pending`。
-4. `/handoff resume` 用索引行、`facts.json` 和已保存的叙事生成摘要，通过 `agent.inject` 注入且不唤醒驱动；用户的下一条消息会带着它进入首个模型 step。
+1. `/handoff` 读取会话投影只用于任务元数据（标题、步数、轮数），然后在任务目录里向当前模型 `followup` 一条带 12 节格式要求的交接指令。
+2. 当前模型用 `write` 直接写 `HANDOFF.md`；插件不拼机械版、不生成 `facts.json`，也不要求调用专用工具。
+3. 一键交接在旧会话这一轮模型结束后再创建新会话；新会话只读 `HANDOFF.md`，从 frontmatter 和正文生成摘要，不默认读取旧会话。
+4. `/handoff resume` 通过 `agent.inject` 注入摘要且不唤醒驱动；用户的下一条消息会带着它进入首个模型 step。
 5. 提醒在 `agent/pre-step` 或 `tools/post-execute` 边界，通过原生的插件 `notice` 通道投递，不打断工具调用。
 
 ## 性能
 
-- `/handoff` 机械版：文档渲染约 0.05ms，命令整体约 0.1s（实测 handler 53ms；一键交接实测 **37ms**）。
-- 旧流程一次约 99s，其中插件逻辑不到 1s，其余是模型读取约 13KB 文档/事实并生成约 10KB 交接文档的时间；现在默认不再触发这一轮。
-- 一键交接创建的新会话会完整读取 HANDOFF.md 和 facts.json（约 9KB，不到 1 秒），然后只生成 **6 行内的接手说明**，不会自动执行长任务；之前“很久”主要是新会话模型直接开始修代码（实测 18 分钟），不是 handoff 本身。
-- `/handoff --narrative` 仍会多一轮模型生成，慢是预期行为，按需使用。
+- 插件本身只发指令和写索引，耗时在毫秒级；主要时间花在旧会话模型生成 `HANDOFF.md` 上，通常几十秒到一两分钟。
+- 一键交接会等旧会话这一轮模型结束再开新会话，避免新会话读到缺失或半写文档；这段时间 Toast 会显示“模型正在写交接文档”。
+- 新会话只读取一份 `HANDOFF.md`，然后生成 **6 行内的接手说明**，不会自动执行长任务。
 
 ## 安全与边界
 
@@ -200,9 +192,9 @@ dsh plugin --profile desktop remove dsh-handoff
 
 ## 已知限制
 
-- 一键交接生成的机械版不包含模型推理；需要模型叙事时用 `/handoff --narrative`，或在新会话里让模型补齐。
+- 交接文档由旧会话模型生成，质量取决于模型是否按模板写全；`/handoff status` 会显示文档是否已生成。
 - 一键交接要求当前会话已有所属工作区；空白会话不会显示该菜单项。
-- 文件地图来自 `write`/`edit`/`str_replace_editor` 工具调用，不是 `git diff`；shell 命令造成的改动只能从命令日志里看到。接续摘要会要求新会话先核对工作区。
+- 如果旧会话模型没有写出 frontmatter 里的 `task_id`，`/handoff resume` 会拒绝载入；重新执行一次 `/handoff` 即可。
 
 ## 开发
 
@@ -212,7 +204,7 @@ dsh plugin --profile desktop remove dsh-handoff
 npm test
 ```
 
-测试覆盖纯 fold、渲染、存储/锁/历史、索引损坏恢复、路径安全和脱敏，以及 `/handoff` 的参数解析与 `resume` 候选选择（含 `--latest`）。
+测试覆盖纯 fold、渲染、存储/锁、索引损坏恢复、路径安全、脱敏、清理，以及 `/handoff` 的参数解析与 `resume` 候选选择（含 `--latest`）。
 
 本地安装工作副本：
 
@@ -233,7 +225,7 @@ npm publish
 
 ## 为什么叫 handoff 而不是 handover？
 
-在 agent / workflow 工具语境里，"handoff" 是「把任务和上下文交给另一个执行者」的通用说法，而且更短。仓库名、包名、命令、工具名、投影 key、数据目录、locale 全部统一用 `handoff`：`dsh-handoff`、`/handoff`、`handoff_write`、`.dsh/handoff`，只需要记一种拼写。以后改名会牵动命令名、工具名和落盘目录，所以把命名决定记录在这里。
+在 agent / workflow 工具语境里，"handoff" 是「把任务和上下文交给另一个执行者」的通用说法，而且更短。仓库名、包名、命令、工具名、投影 key、数据目录、locale 全部统一用 `handoff`：`dsh-handoff`、`/handoff`、`.dsh/handoff`，只需要记一种拼写。以后改名会牵动命令名、工具名和落盘目录，所以把命名决定记录在这里。
 
 ## 许可证
 

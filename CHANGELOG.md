@@ -4,6 +4,28 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-10-29
+
+### Changed
+
+- `/handoff` no longer renders a mechanical document. It creates the task
+  folder and sends the current model a formatted handoff instruction; the model
+  writes the single `HANDOFF.md` with the `write` tool.
+- The document is now the only per-task content file. `facts.json`, `history/`
+  and `resume-log.jsonl` are no longer written and are removed on the next
+  command. The index remains as metadata.
+- The new Session reads only `HANDOFF.md`; it does not read a facts file by
+  default and is told to consult the old Session only when the document is
+  insufficient.
+- One-click handoff waits for the old model turn to finish before creating the
+  new Session, so the document is complete when the new Session reads it.
+- `handoff_write` / `handoff_read` are no longer registered.
+
+### Fixed
+
+- The new Session can no longer start against a missing or half-written handoff
+  document.
+
 ## [0.3.1] - 2026-10-29
 
 ### Changed
