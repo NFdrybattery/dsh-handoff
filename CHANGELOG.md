@@ -4,7 +4,23 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.2.0] - 2026-10-29
+
+### Added
+
+- **Handoff and continue** entry in each Session's `⋯` menu: writes the current
+  Session's handoff, creates a new Session in the same workspace, injects the
+  resume brief, and sends the first prompt automatically. The action lives only
+  in the three-dot menu; the Session header and row keep their shipped icons.
+- Fast, model-free handoff: `/handoff` now writes a complete mechanical
+  document and marks it `pending` immediately (about 0.1s instead of waiting
+  for a ~100s model turn).
+- `/handoff --narrative` opt-in for the old model-written narrative path.
+
+### Changed
+
+- The default handoff is the mechanical document; `handoff_write` remains
+  available for optional enrichment.
 
 ### Fixed
 

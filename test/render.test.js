@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { labelsFor, renderBrief, renderDocument, renderDraft, splitSections } from '../lib/render.js'
+import { labelsFor, renderBrief, renderDocument, renderMechanical, splitSections } from '../lib/render.js'
 
 const meta = {
   taskId: '20261029-1705',
@@ -20,6 +20,8 @@ const meta = {
 const facts = {
   session: { turns: 96, steps: 812 },
   asOfSeq: 42,
+  firstAction: 'Build the plugin',
+  recentAssistantMessages: [{ seq: 40, text: 'The store and tests are in place.' }],
   goal: { objective: 'Ship dsh-handoff' },
   todos: [{ content: 'write tests', status: 'completed' }],
   files: [{ path: 'src/a.ts', writes: 2, edits: 3 }],
@@ -27,8 +29,8 @@ const facts = {
   errors: [{ seq: 11, tool: 'pwsh', summary: 'exit code 1' }],
 }
 
-test('draft renders frontmatter and all twelve sections', () => {
-  const markdown = renderDraft({
+test('mechanical handoff renders all twelve sections without a model turn', () => {
+  const { markdown, narrative } = renderMechanical({
     meta,
     facts,
     files: [{ path: 'src/a.ts', purpose: 'entry', state: 'writes: 2' }],
@@ -37,10 +39,14 @@ test('draft renders frontmatter and all twelve sections', () => {
   assert.ok(markdown.startsWith('---\n'))
   assert.ok(markdown.includes('handoff_version: 1'))
   assert.ok(markdown.includes('task_id: "20261029-1705"'))
-  assert.ok(markdown.includes('status: "draft"'))
+  assert.ok(markdown.includes('status: "pending"'))
   for (const label of labelsFor('zh').sections) assert.ok(markdown.includes(`## ${label}`), label)
   assert.ok(markdown.includes('| `src/a.ts` | entry | writes: 2 |'))
   assert.ok(markdown.includes('seq 11'))
+  assert.ok(markdown.includes('最近一次模型输出'))
+  assert.ok(!markdown.includes('TODO(模型补写)'))
+  assert.equal(narrative.status, 'pending')
+  assert.ok(narrative.next[0].includes('核对工作区'))
 })
 
 test('final document renders narrative sections and first action', () => {
