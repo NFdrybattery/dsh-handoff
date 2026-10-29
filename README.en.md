@@ -126,6 +126,11 @@ Open a Session row's **⋯** menu and choose **Handoff and continue**:
 3. the resume brief is injected and a first prompt is sent, so the new Session
    starts replying without waiting for user input.
 
+Step 3 uses `/handoff resume --latest`, so it always targets the document this
+flow just wrote even when older `pending` tasks exist; a failed injection shows
+a red toast instead of staying silent, and the prompt still points the new
+Session at the newest document.
+
 The action lives only in the three-dot menu — no extra icon on the Session
 header or on the row.
 
@@ -138,9 +143,11 @@ Open a new session in the same workspace and run:
 ```
 
 If exactly one task is `pending`, it is used. With several, the command lists
-them and asks for a task id:
+them and asks for a task id, or `--latest` takes the most recently updated one
+(this is what the one-click handoff uses):
 
 ```text
+/handoff resume --latest
 /handoff resume 20261029-1710-keep-history
 ```
 

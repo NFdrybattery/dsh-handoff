@@ -4,6 +4,36 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-10-29
+
+### Added
+
+- `/handoff resume --latest`: resolve several `pending` tasks to the most
+  recently updated one instead of failing on ambiguity. The ambiguity error now
+  mentions the flag.
+
+### Fixed
+
+- `package.json` no longer starts with a UTF-8 BOM. The 0.2.1 version bump was
+  written by a tool that added one, and the host reads a bundle manifest with
+  `JSON.parse(readFileSync(file, "utf8"))`, so the plugin row was refused at
+  composition time and the plugin manager showed **包不可用 / Package
+  unavailable**. `test/manifest.test.js` now asserts the manifest is BOM-free,
+  parses, and that its declared bundle patch and client entries exist.
+
+- **Handoff and continue** now loads the brief it just wrote. The one-click flow
+  ran a plain `/handoff resume`, which fails with "several pending tasks" as
+  soon as an older task line exists — in this workspace that was the very first
+  time it ran, so the new Session received only the prompt. It now runs
+  `/handoff resume --latest` and reports a failed injection in a toast instead
+  of swallowing it.
+- The one-click flow's first `/handoff` no longer ignores a command error: a
+  non-success outcome aborts the flow with the command's message.
+
+### Changed
+
+- The Chinese README no longer repeats two "known limitations" bullets.
+
 ## [0.2.0] - 2026-10-29
 
 ### Added

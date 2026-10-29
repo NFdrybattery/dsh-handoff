@@ -96,6 +96,8 @@ dsh plugin --profile desktop add dsh-handoff
 2. 在同一工作区创建新会话；
 3. 注入交接摘要并自动发出第一条消息，让新会话直接开始工作。
 
+第 3 步注摘要用的是 `/handoff resume --latest`，所以工作区里有多条历史 `pending` 任务时也会准确接上刚才这份，不会因为「有多个待接续任务」而卡住；万一摘要注入失败，会用一个红色 Toast 说明，新会话仍会按提示自己读最新文档。
+
 按钮只放在三点菜单里，不占用会话标题栏，也不在会话行上增加图标。整个过程不需要再输入；新会话会自动给出回复。
 
 在同一个工作区新开会话，执行：
@@ -104,9 +106,10 @@ dsh plugin --profile desktop add dsh-handoff
 /handoff resume
 ```
 
-只有一条 `pending` 任务时直接使用；多条时会列出并要求带 `taskId`：
+只有一条 `pending` 任务时直接使用；多条时会列出并要求带 `taskId`，或者用 `--latest` 直接接续更新时间最新的一条（一键交接走的就是这条）：
 
 ```text
+/handoff resume --latest
 /handoff resume 20261029-1710-keep-history
 ```
 
@@ -179,11 +182,9 @@ dsh plugin --profile desktop remove dsh-handoff
 
 ## 已知限制
 
-- 一键交接的机械版不包含模型推理；需要模型叙事时用 `/handoff --narrative`，或在新会话里让模型补齐。
+- 一键交接生成的机械版不包含模型推理；需要模型叙事时用 `/handoff --narrative`，或在新会话里让模型补齐。
 - 一键交接要求当前会话已有所属工作区；空白会话不会显示该菜单项。
 - 文件地图来自 `write`/`edit`/`str_replace_editor` 工具调用，不是 `git diff`；shell 命令造成的改动只能从命令日志里看到。接续摘要会要求新会话先核对工作区。
-- 一键交接生成的是机械版，不包含模型推理；需要模型叙事时用 `/handoff --narrative`，或让新会话补齐。
-- 一键交接要求会话属于某个工作区；空白会话不会显示该菜单项。
 
 ## 开发
 

@@ -37,3 +37,31 @@ test('the latest already-resumed task wins', () => {
   const newer = row('t2', { status: 'resumed', resumedBy: ['s1'], resumedAt: '2026-10-29T18:05:00+08:00' })
   assert.deepEqual(pickResumeTask([older, newer], 's1'), { kind: 'already', task: newer })
 })
+
+test('latest resolves several pending tasks to the most recently updated one', () => {
+  const older = row('t1', { updatedAt: '2026-10-29T18:00:00+08:00' })
+  const newer = row('t2', { updatedAt: '2026-10-29T19:57:12+08:00' })
+  const picked = pickResumeTask([older, newer], 's1', '', { latest: true })
+  assert.equal(picked.kind, 'task')
+  assert.equal(picked.task.taskId, 't2')
+  assert.equal(picked.latest, true)
+})
+
+test('latest falls back to createdAt when updatedAt is missing', () => {
+  const older = row('t1', { createdAt: '2026-10-29T18:00:00+08:00' })
+  const newer = row('t2', { createdAt: '2026-10-29T19:57:12+08:00' })
+  assert.equal(pickResumeTask([newer, older], 's1', '', { latest: true }).task.taskId, 't2')
+})
+
+test('latest does not override an explicit task id or a single pending task', () => {
+  const older = row('t1', { updatedAt: '2026-10-29T18:00:00+08:00' })
+  const newer = row('t2', { updatedAt: '2026-10-29T19:57:12+08:00' })
+  assert.equal(pickResumeTask([older, newer], 's1', 't1', { latest: true }).task.taskId, 't1')
+  const single = pickResumeTask([older], 's1', '', { latest: true })
+  assert.deepEqual(single, { kind: 'task', task: older })
+})
+
+test('latest does not invent a candidate when nothing is pending', () => {
+  const draft = row('t1', { status: 'draft' })
+  assert.deepEqual(pickResumeTask([draft], 's1', '', { latest: true }), { kind: 'none' })
+})
