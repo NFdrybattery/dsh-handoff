@@ -38,6 +38,34 @@ test('the latest already-resumed task wins', () => {
   assert.deepEqual(pickResumeTask([older, newer], 's1'), { kind: 'already', task: newer })
 })
 
+test('--latest uses the exact task id the writer just updated', () => {
+  const older = row('t1', { updatedAt: '2026-10-29T20:30:00+08:00' })
+  const target = row('t2', { updatedAt: '2026-10-29T20:00:00+08:00' })
+  assert.deepEqual(pickResumeTask([older, target], 's1', '', { latest: true, latestTaskId: 't2' }), {
+    kind: 'task',
+    task: target,
+    latest: true,
+  })
+})
+
+test('--latest reports already resumed when the exact task belongs to this session', () => {
+  const task = row('t1', { status: 'resumed', resumedBy: ['s1'], resumedAt: '2026-10-29T20:00:00+08:00' })
+  assert.deepEqual(pickResumeTask([task], 's1', '', { latest: true, latestTaskId: 't1' }), {
+    kind: 'already',
+    task,
+  })
+})
+
+test('--latest falls back to the newest pending row without an exact id', () => {
+  const older = row('t1', { updatedAt: '2026-10-29T20:00:00+08:00' })
+  const newer = row('t2', { updatedAt: '2026-10-29T20:30:00+08:00' })
+  assert.deepEqual(pickResumeTask([older, newer], 's1', '', { latest: true, latestTaskId: null }), {
+    kind: 'task',
+    task: newer,
+    latest: true,
+  })
+})
+
 test('latest resolves several pending tasks to the most recently updated one', () => {
   const older = row('t1', { updatedAt: '2026-10-29T18:00:00+08:00' })
   const newer = row('t2', { updatedAt: '2026-10-29T19:57:12+08:00' })

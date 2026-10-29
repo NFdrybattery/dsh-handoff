@@ -49,6 +49,7 @@ dsh plugin --profile desktop add dsh-handoff
     remindEverySteps: 200
     remindAfterTokens: 120000
     handoffDir: .dsh/handoff
+    retentionDays: 1
     language: zh
 ```
 
@@ -64,6 +65,7 @@ dsh plugin --profile desktop add dsh-handoff
 | `maxCommandLog` | `40` | facts 保留的最近 shell 命令数。 |
 | `maxErrors` | `30` | facts 保留的最近失败工具调用数。 |
 | `keepHistory` | `10` | 每个任务保留的 `HANDOFF.md` 历史版本数。 |
+| `retentionDays` | `1` | 任务最后一次更新超过这么多天就删除整个任务目录；`0` 关闭自动清理。 |
 | `resumeBriefMaxChars` | `2400` | 接续摘要最大字符数。 |
 | `language` | `zh` | 文档语言：`zh` 或 `en`。 |
 
@@ -157,6 +159,10 @@ dsh plugin --profile desktop remove dsh-handoff
 任务 id 为 `<YYYYMMDD-HHmm>[-ascii-slug]`；同一会话复用当前任务 id，除非传 `--new`。接手过某任务的会话再执行 `/handoff`，更新的就是那条被接手的任务线，不会另起一份文档。状态流转：`draft` → `pending` → `resumed`，终态 `archived`。
 
 不想把交接笔记提交进仓库，就把 `.dsh/` 加进 `.gitignore`；想随项目交付就保留。插件不会自动改你的 `.gitignore`。
+
+**自动清理**：每次执行 `/handoff` 命令时，会先删除最后一次更新超过 `retentionDays`（默认 1 天）的任务目录，并同步从 `index.json` 移除；按 `updatedAt` 计算，删除后不可恢复。设为 `0` 关闭清理。
+
+**载入校验**：`/handoff resume` 会核对 `index.json`、`HANDOFF.md` frontmatter 的 `task_id`、`facts.json` 的 `taskId` 和索引路径，不一致就拒绝注入；`--latest` 使用 `index.latestTaskId`，精确指向刚写完的那条任务，而不是靠时间猜测。
 
 ## 工作原理
 

@@ -4,6 +4,25 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-10-29
+
+### Added
+
+- `retentionDays` (default `1`): every `/handoff` command removes task folders
+  and index rows whose last update is older than the configured number of days.
+  `0` disables cleanup; deletion is irreversible. Orphan task folders are
+  removed too.
+- Handoff loading now validates identity before injecting a brief: the index
+  row's `docPath`/`factsPath`, HANDOFF.md's `task_id`, and facts.json's
+  `taskId` must all match the selected task. A mismatch refuses the resume.
+- `index.latestTaskId` records the exact task the producing command wrote;
+  `/handoff resume --latest` targets it instead of guessing from timestamps.
+
+### Fixed
+
+- A resume can no longer load a document from a different task line when the
+  workspace has several pending handoffs or when a document is stale/corrupt.
+
 ## [0.2.3] - 2026-10-29
 
 ### Changed

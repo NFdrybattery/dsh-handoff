@@ -68,6 +68,7 @@ Override the row in your profile's `cordis.patch.yml`:
     remindEverySteps: 200
     remindAfterTokens: 120000
     handoffDir: .dsh/handoff
+    retentionDays: 1
     language: zh
 ```
 
@@ -83,6 +84,7 @@ Override the row in your profile's `cordis.patch.yml`:
 | `maxCommandLog` | `40` | Recent shell commands kept in `facts.json`. |
 | `maxErrors` | `30` | Recent failed tool calls kept in `facts.json`. |
 | `keepHistory` | `10` | Previous `HANDOFF.md` versions kept per task. |
+| `retentionDays` | `1` | Delete a task folder when its last update is older than this many days; `0` disables cleanup. |
 | `resumeBriefMaxChars` | `2400` | Maximum injected resume brief length. |
 | `language` | `zh` | Document language: `zh` or `en`. |
 
@@ -213,6 +215,17 @@ flows `draft` → `pending` → `resumed`, with `archived` as the terminal state
 Add `.dsh/` to `.gitignore` if you do not want handoff notes committed, or leave
 it tracked if the handoff is part of the deliverable. The plugin never edits
 your `.gitignore`.
+
+**Automatic cleanup**: every `/handoff` command first deletes task folders
+whose last update is older than `retentionDays` (default 1 day) and removes
+their index rows. Age is based on `updatedAt`; deletion is irreversible. Set it
+to `0` to disable cleanup.
+
+**Load validation**: `/handoff resume` checks the index row against the
+`task_id` in HANDOFF.md frontmatter, `facts.json`'s `taskId`, and the indexed
+document paths. A mismatch refuses the injection. `--latest` uses
+`index.latestTaskId` written by the producing command, so it targets exactly
+the task just written instead of guessing by timestamps.
 
 ## How it works
 

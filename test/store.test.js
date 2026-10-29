@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { mkdtemp, readFile, readdir, rm, writeFile, mkdir } from 'node:fs/promises'
+import { mkdtemp, readFile, readdir, rm, writeFile, mkdir, utimes } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { HandoffStore, parseFrontmatter, resolveHandoffDir } from '../lib/store.js'
@@ -199,5 +199,56 @@ test('findTaskForSession matches the source session and any session that resumed
   assert.equal(store.findTaskForSession(index, 'session-other').taskId, 'other-line')
   assert.equal(store.findTaskForSession(index, 'session-new'), undefined)
   assert.equal(store.findTaskForSession(index, ''), undefined)
+})
+
+test('cleanupExpired removes old tasks, orphan folders and keeps the latest', async () => {
+  const root = await workspace()
+  try {
+    const store = new HandoffStore({ cwd: root })
+    await store.init()
+    const oldId = '20200101-0000-old'
+    const freshId = '20261029-2000-fresh'
+    for (const [taskId, updatedAt] of [
+      [oldId, '2020-01-01T00:00:00+08:00'],
+      [freshId, '2026-10-29T20:00:00+08:00'],
+    ]) {
+      await store.writeFacts(taskId, { taskId, title: taskId })
+      await store.writeDoc(taskId, `---\ntask_id: "${taskId}"\nstatus: "pending"\n---\n`)
+      await store.upsertTask({ taskId, title: taskId, status: 'pending', updatedAt })
+    }
+    // Orphan folder: no index row, old mtime.
+    const orphanId = 'orphan-1'
+    await mkdir(store.taskDir(orphanId), { recursive: true })
+    await writeFile(join(store.taskDir(orphanId), 'HANDOFF.md'), 'x', 'utf8')
+    const oldDate = new Date('2020-01-01T00:00:00Z')
+    await utimes(store.taskDir(orphanId), oldDate, oldDate)
+
+    const result = await store.cleanupExpired({ retentionMs: 7 * 86_400_000 })
+    assert.deepEqual(result.removed.sort(), [oldId, orphanId].sort())
+    assert.equal(await store.taskExists(oldId), false)
+    assert.equal(await store.taskExists(orphanId), false)
+    assert.equal(await store.taskExists(freshId), true)
+
+    const { index } = await store.readIndex()
+    assert.equal(index.tasks.length, 1)
+    assert.equal(index.tasks[0].taskId, freshId)
+    assert.equal(index.latestTaskId, freshId)
+  } finally {
+    await rm(root, { recursive: true, force: true })
+  }
+})
+
+test('cleanupExpired is disabled by a non-positive retention', async () => {
+  const root = await workspace()
+  try {
+    const store = new HandoffStore({ cwd: root })
+    await store.init()
+    await store.writeFacts('old-task', { taskId: 'old-task' })
+    await store.upsertTask({ taskId: 'old-task', title: 'old', status: 'pending', updatedAt: '2020-01-01T00:00:00+08:00' })
+    assert.deepEqual(await store.cleanupExpired({ retentionMs: 0 }), { removed: [], warnings: [] })
+    assert.equal(await store.taskExists('old-task'), true)
+  } finally {
+    await rm(root, { recursive: true, force: true })
+  }
 })
 
