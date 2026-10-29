@@ -15,15 +15,16 @@ re-discovering the task from a 1000-step conversation.
 - Add `--narrative` when a model-written summary is wanted. The mechanical
   facts in `facts.json` stay authoritative and are never invented.
 - The Session row's **⋯** menu has **Handoff and continue**: one click hands
-  off, creates a new Session in the same workspace, loads the brief, and sends
-  the first prompt automatically.
+  off, creates a new Session in the same workspace, loads the brief, and asks
+  for a ≤6-line takeover note; it does not start a long task.
 - In a new session, `/handoff resume` injects a ≤2400-character resume brief
   into the next message: where the work stands, the full document path, and the
   single first action.
 - At 800 steps (configurable), a non-interrupting notice suggests handing off;
   it repeats once per 200-step band and once for context pressure.
 - Everything is local: documents live in `<workspace>/.dsh/handoff/<taskId>/`;
-  no network, no subagent or out-of-band LLM call, no automatic new session.
+  no network, no subagent or out-of-band LLM call. A new Session is created
+  only when you explicitly click **Handoff and continue**.
 
 ## Install
 
@@ -124,7 +125,10 @@ Open a Session row's **⋯** menu and choose **Handoff and continue**:
 1. the current Session's mechanical handoff is written immediately;
 2. a new Session is created in the same workspace;
 3. the resume brief is injected and a first prompt is sent, so the new Session
-   starts replying without waiting for user input.
+   replies with a 6-line takeover note and next steps.
+
+The new Session does not modify files or run long commands yet; confirm its plan
+before it starts work.
 
 Step 3 uses `/handoff resume --latest`, so it always targets the document this
 flow just wrote even when older `pending` tasks exist; a failed injection shows
@@ -233,7 +237,10 @@ your `.gitignore`.
   command is about 0.1s (measured: command handler 53ms, `handoff_write` 47ms).
 - The old path took about 99s, of which plugin work was under 1s; the rest was
   the model reading ~13KB and generating a ~10KB narrative. The default no
-  longer triggers that turn.
+  longer triggers that turn. One-click handoff measured 37ms.
+- The earlier "very slow" one-click run was an 18-minute model task: the new
+  Session was told to start executing the handoff immediately. It now replies
+  with a 6-line takeover note and waits for confirmation.
 - `/handoff --narrative` still adds one model turn and is expected to be slow;
   use it only when a model-written summary is needed.
 
@@ -246,8 +253,9 @@ your `.gitignore`.
   the workspace are marked and never read.
 - Shell commands, errors, and the brief pass through credential redaction
   (`sk-*`, `Bearer *`, `*_KEY=*`, private-key blocks).
-- The plugin does not create sessions, does not send messages automatically,
-  does not modify session logs, and does not replace `/compact`.
+- Apart from the explicit **Handoff and continue** click, the plugin does not
+  create sessions or send messages; it does not modify session logs and does
+  not replace `/compact`.
 - Uninstalling the plugin leaves every document on disk.
 
 ## Known limitations
