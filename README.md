@@ -142,7 +142,7 @@ dsh plugin --profile desktop remove dsh-handoff
     resume-log.jsonl            谁在何时接手的记录
 ```
 
-任务 id 为 `<YYYYMMDD-HHmm>[-ascii-slug]`；同一会话复用当前任务 id，除非传 `--new`。状态流转：`draft` → `pending` → `resumed`，终态 `archived`。
+任务 id 为 `<YYYYMMDD-HHmm>[-ascii-slug]`；同一会话复用当前任务 id，除非传 `--new`。接手过某任务的会话再执行 `/handoff`，更新的就是那条被接手的任务线，不会另起一份文档。状态流转：`draft` → `pending` → `resumed`，终态 `archived`。
 
 不想把交接笔记提交进仓库，就把 `.dsh/` 加进 `.gitignore`；想随项目交付就保留。插件不会自动改你的 `.gitignore`。
 

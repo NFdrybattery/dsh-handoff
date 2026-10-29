@@ -176,8 +176,9 @@ on disk; delete them yourself if you no longer want them.
 ```
 
 Task ids are `<YYYYMMDD-HHmm>[-ascii-slug]`; the same session reuses its task id
-unless `--new` is passed. Status flows `draft` → `pending` → `resumed`, with
-`archived` as the terminal state.
+unless `--new` is passed. A session that resumed a task updates that same task
+line when it runs `/handoff`, instead of starting a second document. Status
+flows `draft` → `pending` → `resumed`, with `archived` as the terminal state.
 
 Add `.dsh/` to `.gitignore` if you do not want handoff notes committed, or leave
 it tracked if the handoff is part of the deliverable. The plugin never edits

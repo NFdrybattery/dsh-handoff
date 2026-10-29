@@ -164,3 +164,40 @@ test('parseFrontmatter handles quoted and scalar values', () => {
   )
   assert.deepEqual(parsed, { handoff_version: 1, task_id: '20261029-1705', status: 'pending', steps: 812 })
 })
+
+test('findTaskForSession matches the source session and any session that resumed it', () => {
+  const store = new HandoffStore({ cwd: resolve('/ws-fixture') })
+  const index = {
+    schemaVersion: 1,
+    tasks: [
+      {
+        taskId: 'resumed-line',
+        sourceSessionId: 'session-source',
+        resumedBy: ['session-continued'],
+        status: 'resumed',
+        updatedAt: '2026-10-29T18:00:00+08:00',
+      },
+      {
+        taskId: 'other-line',
+        sourceSessionId: 'session-other',
+        resumedBy: [],
+        status: 'pending',
+        updatedAt: '2026-10-29T18:10:00+08:00',
+      },
+      {
+        taskId: 'archived-line',
+        sourceSessionId: 'session-source',
+        resumedBy: [],
+        status: 'archived',
+        updatedAt: '2026-10-29T18:20:00+08:00',
+      },
+    ],
+  }
+
+  assert.equal(store.findTaskForSession(index, 'session-source').taskId, 'resumed-line')
+  assert.equal(store.findTaskForSession(index, 'session-continued').taskId, 'resumed-line')
+  assert.equal(store.findTaskForSession(index, 'session-other').taskId, 'other-line')
+  assert.equal(store.findTaskForSession(index, 'session-new'), undefined)
+  assert.equal(store.findTaskForSession(index, ''), undefined)
+})
+

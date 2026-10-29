@@ -8,9 +8,24 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- `/handoff` and the threshold reminders now read the session-projection
+  registry through `ctx.get('sessionProjections')` instead of a plain
+  `ctx.sessionProjections` property read. A Cordis context rejects the latter
+  for services the plugin did not inject (`cannot get property … without
+  inject`), so every projection read degraded to `undefined` and `facts.json`
+  listed `sessionStats`, `contextPressure`, `todos`, `goal` and `title` as
+  unavailable.
+- `facts.json` now derives `pressureTokens` the same way the shipped
+  `contextPressure` wire view does (prompt-side sample plus surface movement)
+  instead of falling back to the raw prompt-side figure, because the host
+  projection state carries no `projectedTokens`.
 - `/handoff resume` in a session that already resumed a task now reports that
   fact instead of failing on an unrelated `draft` row; running it again no
   longer looks like a broken command.
+- `/handoff` run from a session that resumed a task now updates that same task
+  line instead of starting a second document, so the resume brief's
+  "完成一个阶段后用 /handoff 更新文档" actually works in the continued session.
+  Task lookup matches `sourceSessionId` or a `resumedBy` entry.
 - The resume brief no longer renders `undefined` for the progress label, and
   the success text explains that the brief lands on the next user message
   rather than starting a turn by itself.

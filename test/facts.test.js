@@ -8,6 +8,9 @@ import {
   createFactsProjection,
   DEFAULT_FACT_LIMITS,
   foldSessionEvents,
+  projectedPressureTokens,
+  readFactsState,
+  resolveProjectionRegistry,
 } from '../lib/facts.js'
 
 const event = (type, seq, data, time = 1_000 + seq) => ({ type, seq, time, data })
@@ -202,3 +205,116 @@ test('projection definition is host-only and versioned', () => {
   assert.equal(definition.wire, undefined)
   assert.deepEqual(definition.init(), createEmptyFacts())
 })
+
+/**
+ * A test double with the exact Cordis read semantics that caused the
+ * command-side regression: a service the plugin did not inject is rejected on
+ * plain property access, while `get(name)` is the supported read-without-inject
+ * seam.
+ */
+function cordisLikeContext(services) {
+  const ctx = {
+    get(name) {
+      return services[name]
+    },
+  }
+  for (const name of Object.keys(services)) {
+    Object.defineProperty(ctx, name, {
+      get() {
+        throw new Error(`cannot get property "${name}" without inject`)
+      },
+    })
+  }
+  return ctx
+}
+
+test('resolveProjectionRegistry reads through ctx.get when plain access is rejected', () => {
+  const registry = { stateOf: () => undefined }
+  const ctx = cordisLikeContext({ sessionProjections: registry })
+  assert.throws(() => ctx.sessionProjections, /without inject/)
+  assert.equal(resolveProjectionRegistry(ctx), registry)
+})
+
+test('resolveProjectionRegistry degrades to undefined when no registry is composed', () => {
+  const ctx = { get: () => undefined }
+  assert.equal(resolveProjectionRegistry(ctx), undefined)
+  assert.equal(resolveProjectionRegistry(undefined), undefined)
+})
+
+test('readFactsState reads the folded state through a non-injected registry', () => {
+  const state = createEmptyFacts()
+  state.steps = 7
+  const session = { id: 'session-1', seq: 9, header: { cwd: '/ws-fixture' } }
+  const registry = {
+    stateOf: (target, key) => (target === session && key === 'handoffFacts' ? state : undefined),
+  }
+  const ctx = cordisLikeContext({ sessionProjections: registry })
+  assert.equal(readFactsState(ctx, session), state)
+})
+
+test('collectFacts-style snapshot loses no projection through a non-injected registry', () => {
+  // Mirrors commands.js: read the registry once, then project each key.
+  const projections = {
+    sessionStats: { turns: 4, steps: 20 },
+    contextPressure: { projectedTokens: 2048, contextWindow: 131072 },
+    todos: [{ content: 'fix projection read', status: 'in_progress' }],
+    goal: { current: { goal: { objective: 'ship', phase: 'active', maxGoalRounds: 5 }, roundsStarted: 1 } },
+    title: 'Real session title',
+  }
+  const session = { id: 'session-2', seq: 30, header: { cwd: '/ws-fixture' } }
+  const registry = { stateOf: (target, key) => (target === session ? projections[key] : undefined) }
+  const ctx = cordisLikeContext({ sessionProjections: registry })
+  const resolved = resolveProjectionRegistry(ctx)
+  const read = (key) => {
+    try {
+      return resolved?.stateOf?.(session, key)
+    } catch {
+      return undefined
+    }
+  }
+  const facts = buildFactsSnapshot({ state: createEmptyFacts(), session, getProjection: read })
+
+  assert.deepEqual(facts.unavailable, [])
+  assert.equal(facts.title, 'Real session title')
+  assert.equal(facts.session.steps, 20)
+  assert.equal(facts.session.turns, 4)
+  assert.equal(facts.session.pressureTokens, 2048)
+  assert.equal(facts.session.contextWindow, 131072)
+  assert.deepEqual(facts.todos, [{ content: 'fix projection read', status: 'in_progress' }])
+  assert.equal(facts.goal.objective, 'ship')
+})
+
+test('projected context pressure mirrors the contextPressure wire view', () => {
+  assert.equal(
+    projectedPressureTokens({ pressureTokens: 1000, surfaceTokens: 120, sampledSurfaceTokens: 100 }),
+    1020,
+  )
+  assert.equal(projectedPressureTokens({ pressureTokens: 1000 }), 1000)
+  assert.equal(projectedPressureTokens({ pressureTokens: 10, surfaceTokens: 1, sampledSurfaceTokens: 5 }), 6)
+  assert.equal(projectedPressureTokens({ projectedTokens: 999, pressureTokens: 1 }), 999)
+  assert.equal(projectedPressureTokens(undefined), undefined)
+  assert.equal(projectedPressureTokens({ surfaceTokens: 5 }), undefined)
+})
+
+test('facts snapshot derives pressure from the host state, not the client view', () => {
+  const session = { id: 'session-3', seq: 12, header: { cwd: '/ws-fixture' } }
+  const projections = {
+    sessionStats: { turns: 1, steps: 2 },
+    contextPressure: { pressureTokens: 800, surfaceTokens: 40, sampledSurfaceTokens: 30, contextWindow: 65536 },
+    todos: null,
+    goal: { current: null, seenGoalIds: [], failure: null },
+    title: 'State-only pressure',
+  }
+  const facts = buildFactsSnapshot({
+    state: createEmptyFacts(),
+    session,
+    getProjection: (key) => projections[key],
+  })
+  assert.deepEqual(facts.unavailable, [])
+  assert.equal(facts.session.pressureTokens, 810)
+  assert.equal(facts.session.contextWindow, 65536)
+  assert.deepEqual(facts.todos, [])
+  assert.equal(facts.goal, null)
+})
+
+
