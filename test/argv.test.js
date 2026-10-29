@@ -41,8 +41,15 @@ test('narrative and help flags still parse', () => {
   assert.equal(parseInput(' help').help, true)
 })
 
+test('resume --wake asks the handler to wake the new session', () => {
+  const parsed = parseInput(' resume --latest --wake')
+  assert.equal(parsed.subcommand, 'resume')
+  assert.equal(parsed.latest, true)
+  assert.equal(parsed.wake, true)
+})
+
 test('the one-click client half asks for the latest task, not an ambiguous resume', async () => {
   const source = await readFile(new URL('../lib/client.js', import.meta.url), 'utf8')
-  assert.match(source, /\/handoff resume --latest/, 'the client must resolve the freshly written task explicitly')
+  assert.match(source, /\/handoff resume --latest --wake/, 'the client must resolve the task and wake the model')
   assert.doesNotMatch(source, /\/handoff resume'/, 'a bare resume fails once an older pending task exists')
 })

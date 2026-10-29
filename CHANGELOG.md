@@ -4,6 +4,18 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-10-29
+
+### Added
+
+- `HANDOFF.md` now includes section 12, the takeover reply format. The
+  document carries the six-list-item template, so the new Session can read the
+  format from the document instead of a long prompt.
+- `/handoff resume --wake` injects the brief and starts the model turn from the
+  command handler. One-click handoff uses it, so the first visible input is the
+  collapsed command result rather than a long user prompt; a short fallback
+  prompt is used only if waking fails.
+
 ## [0.4.2] - 2026-10-29
 
 ### Fixed

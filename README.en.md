@@ -10,8 +10,9 @@ re-discovering the task from a 1000-step conversation.
 ## What it does
 
 - `/handoff` sends a handoff instruction to the current Session in the
-  background; the model writes `HANDOFF.md` in a fixed 12-section format. No
-  mechanical document and no `facts.json`.
+  background; the model writes `HANDOFF.md` in a fixed 0–12 (13-section)
+  format, with section 12 defining the takeover reply. No mechanical document
+  and no `facts.json`.
 - The document is the whole handoff: frontmatter records task/source/size and
   the body carries summary, state, decisions, file map, failures, verification
   and open questions.
@@ -112,11 +113,12 @@ after that model turn finishes. Check it with:
 `/handoff update` is an explicit spelling of the same action; `/handoff --new`
 starts another task line even when this session already owns one.
 
-The document has twelve sections: 60-second summary, goal/acceptance, current
+The document has 13 sections: 60-second summary, goal/acceptance, current
 state, completed, next steps, decisions, file map, pitfalls, verification,
-environment, open questions, and related sessions. The instruction requires
-facts from the current Session, no invented changes, no credentials, and a
-frontmatter `task_id`. `HANDOFF.md` is the only content file.
+environment, open questions, related sessions, and the takeover reply format.
+The instruction requires facts from the current Session, no invented changes,
+no credentials, a frontmatter `task_id`, and the six-label reply template in
+section 12. `HANDOFF.md` is the only content file.
 
 ### One-click handoff (Session ⋯ menu)
 
@@ -124,22 +126,25 @@ Open a Session row's **⋯** menu and choose **Handoff and continue**:
 
 1. the current Session is told to write `HANDOFF.md`;
 2. the old model turn is allowed to finish (Toast shows progress, up to 4 minutes);
-3. a new Session is created in the same workspace, the brief is injected, and a
-   first prompt asks it to read **only HANDOFF.md** (all 12 sections) and reply
-   with the six-item takeover list.
+3. a new Session is created and runs `/handoff resume --latest --wake`: the
+   command result is a collapsed card, and the handler wakes the model, which
+   reads **only HANDOFF.md** (including section 12) and replies with the
+   six-item takeover list.
 
 The new Session does not modify files or run long commands yet; confirm its plan
 before it starts work.
 
-Step 3 uses `/handoff resume --latest`, so it always targets the document this
-flow just wrote even when older `pending` tasks exist; a failed injection shows
-a red toast instead of staying silent, and the prompt still points the new
-Session at the newest document.
+Step 3 uses `/handoff resume --latest --wake`, so it targets the document this
+flow just wrote even when older `pending` tasks exist. The command result is a
+collapsed card; the handler wakes the model instead of sending a long user
+prompt. If the wake fails, a short fallback prompt is sent and a red toast
+explains it.
 
 The injected brief is a short field block (ID / Source / Size / State /
-Progress / Document / First action / Next / Rules), not a paragraph. The
-automatic prompt requires six Markdown list items (one per line, so the chat
-view cannot collapse single newlines into one paragraph):
+Progress / Document / First action / Next / Rules), not a paragraph. Section 12
+of the document carries the reply format, which requires six Markdown list
+items (one per line, so the chat view cannot collapse single newlines into one
+paragraph):
 
 ```text
 - [Takeover] taskId + title + what you are taking over (one sentence)
@@ -211,7 +216,7 @@ on disk; delete them yourself if you no longer want them.
 <workspace>/.dsh/handoff/
   index.json                    workspace-wide task index (metadata, locked)
   <taskId>/
-    HANDOFF.md                  the only content file (YAML frontmatter + 12 sections)
+    HANDOFF.md                  the only content file (YAML frontmatter + 0–12, 13 sections)
 ```
 
 Legacy `facts.json`, `history/` and `resume-log.jsonl` are deleted on the next
@@ -241,15 +246,16 @@ instead of guessing by timestamps.
 
 1. `/handoff` reads the session projections only for task metadata (title,
    steps, turns), creates the task folder, and sends the current model a
-   `followup` instruction with the 12-section format.
+   `followup` instruction with the 0–12 (13-section) format.
 2. The current model writes `HANDOFF.md` with `write`. The plugin does not
    render a mechanical document, does not create `facts.json`, and does not
    require a dedicated tool.
 3. One-click handoff waits for that old model turn to finish, then creates the
    new Session. The new Session reads only `HANDOFF.md`, builds the brief from
    its frontmatter and body, and does not read the old Session by default.
-4. `/handoff resume` injects the brief without waking the driver. The next user
-   message carries it into the first model step.
+4. `/handoff resume` injects the brief; with `--wake` the handler also starts a
+   model turn with a short instruction. Without `--wake`, the next user message
+   carries it into the first model step.
 5. Reminders are delivered at `agent/pre-step` or `tools/post-execute` through
    the native plugin-sourced `notice` channel; they never interrupt a tool call.
 
