@@ -33,6 +33,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - The Chinese README no longer repeats two "known limitations" bullets.
+- `/handoff` argument parsing moved to `lib/argv.js` and is covered by tests,
+  including `--latest` and the client's resume wiring.
 
 ## [0.2.0] - 2026-10-29
 

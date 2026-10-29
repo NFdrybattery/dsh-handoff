@@ -194,7 +194,7 @@ dsh plugin --profile desktop remove dsh-handoff
 npm test
 ```
 
-测试覆盖纯 fold、渲染、存储/锁/历史、索引损坏恢复、路径安全和脱敏。
+测试覆盖纯 fold、渲染、存储/锁/历史、索引损坏恢复、路径安全和脱敏，以及 `/handoff` 的参数解析与 `resume` 候选选择（含 `--latest`）。
 
 本地安装工作副本：
 
