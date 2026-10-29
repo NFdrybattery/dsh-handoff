@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { clamp, firstLine, isoLocal, parseArguments, redactSecrets, slugify, stampCompact, textFromContent } from '../lib/util.js'
+import { clamp, firstLine, isoLocal, parseArguments, redactSecrets, slugify, stampCompact, taskCreatedAt, textFromContent } from '../lib/util.js'
 
 test('redactSecrets removes common credential shapes', () => {
   const input = [
@@ -59,4 +59,15 @@ test('timestamps are local ISO strings and compact ids', () => {
   const date = new Date(2026, 9, 29, 17, 5, 9)
   assert.match(isoLocal(date), /^2026-10-29T17:05:09[+-]\d{2}:\d{2}$/)
   assert.equal(stampCompact(date), '20261029-1705')
+})
+
+test('taskCreatedAt keeps the original task birthday on updates', () => {
+  assert.equal(
+    taskCreatedAt('2026-10-29T18:02:24+08:00', '2026-10-29T19:09:09+08:00'),
+    '2026-10-29T18:02:24+08:00',
+  )
+  assert.equal(taskCreatedAt(undefined, '2026-10-29T19:09:09+08:00'), '2026-10-29T19:09:09+08:00')
+  assert.equal(taskCreatedAt('  ', ''), isoLocal(new Date()))
+  const date = new Date(2026, 9, 29, 17, 5, 9)
+  assert.equal(taskCreatedAt('', '', date), isoLocal(date))
 })

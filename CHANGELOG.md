@@ -26,6 +26,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   line instead of starting a second document, so the resume brief's
   "完成一个阶段后用 /handoff 更新文档" actually works in the continued session.
   Task lookup matches `sourceSessionId` or a `resumedBy` entry.
+- `handoff_write` keeps the task's original `createdAt` when it updates an
+  existing document, instead of adopting `facts.generatedAt` (the facts
+  snapshot time). Task age and ids no longer jump on every document write.
 - The resume brief no longer renders `undefined` for the progress label, and
   the success text explains that the brief lands on the next user message
   rather than starting a turn by itself.
