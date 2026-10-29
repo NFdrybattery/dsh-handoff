@@ -170,20 +170,27 @@ Open a new session in the same workspace and run:
 ```
 
 If exactly one task is `pending`, it is used. With several, the command lists
-them and asks for a task id, or `--latest` takes the most recently updated one
-(this is what the one-click handoff uses):
+them and asks for a task id, or `--latest` takes the most recently updated one.
+The one-click flow uses `--latest --wake`:
 
 ```text
+/handoff resume
 /handoff resume --latest
+/handoff resume --latest --wake
 /handoff resume 20261029-1710-keep-history
 ```
 
-The resume brief is injected with `agent.inject`, so it travels with the next
-message you send; **the command does not start a turn**, and no reply appears
-on its own. Send any message to let the model continue with the brief. The task
-is marked `resumed` and recorded in `index.json`. Re-running the command
-in the same session reports that it was already resumed; add `--force` to
-inject again.
+- Without `--wake`: the brief is injected with `agent.inject`, so it travels
+  with the next message you send; **the command does not start a turn**, and no
+  reply appears on its own. Send any message to continue with the brief.
+- With `--wake`: the command handler injects the brief and starts the model
+  turn itself; the command result is a collapsed card, which is what the
+  one-click flow uses. If waking fails, the client sends a short fallback
+  prompt.
+
+The task is marked `resumed` and recorded in `index.json`. Re-running the
+command in the same session reports that it was already resumed; add `--force`
+to inject again.
 
 ### Tools for the model
 
