@@ -1,5 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { join, resolve } from 'node:path'
 import {
   applyFactsEvent,
   buildFactsSnapshot,
@@ -151,6 +152,8 @@ test('foldSessionEvents replays an array', () => {
 })
 
 test('buildFactsSnapshot reads shipped projections and relativizes files', () => {
+  const workspace = resolve('/ws-fixture')
+  const filePath = join(workspace, 'src', 'a.ts')
   let state = createEmptyFacts()
   state = applyFactsEvent(
     state,
@@ -159,7 +162,7 @@ test('buildFactsSnapshot reads shipped projections and relativizes files', () =>
       step: 1,
       callId: 'c1',
       name: 'write',
-      arguments: JSON.stringify({ file_path: 'C:\\ws\\src\\a.ts' }),
+      arguments: JSON.stringify({ file_path: filePath }),
     }),
     DEFAULT_FACT_LIMITS,
   )
@@ -171,7 +174,7 @@ test('buildFactsSnapshot reads shipped projections and relativizes files', () =>
     plan: { active: true },
     title: 'Demo task',
   }
-  const session = { id: 'session-1', seq: 9, header: { cwd: 'C:\\ws' } }
+  const session = { id: 'session-1', seq: 9, header: { cwd: workspace } }
   const facts = buildFactsSnapshot({
     state,
     session,
@@ -180,7 +183,7 @@ test('buildFactsSnapshot reads shipped projections and relativizes files', () =>
 
   assert.equal(facts.schemaVersion, 1)
   assert.equal(facts.asOfSeq, 8)
-  assert.equal(facts.workspace, 'C:\\ws')
+  assert.equal(facts.workspace, workspace)
   assert.equal(facts.title, 'Demo task')
   assert.equal(facts.session.turns, 3)
   assert.equal(facts.session.steps, 12)
