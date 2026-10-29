@@ -127,9 +127,11 @@ them and asks for a task id:
 ```
 
 The resume brief is injected with `agent.inject`, so it travels with the next
-message you send. The task is marked `resumed` and recorded in
-`resume-log.jsonl`. Re-running the command in the same session reports that it
-was already resumed; add `--force` to inject again.
+message you send; **the command does not start a turn**, and no reply appears
+on its own. Send any message to let the model continue with the brief. The task
+is marked `resumed` and recorded in `resume-log.jsonl`. Re-running the command
+in the same session reports that it was already resumed; add `--force` to
+inject again.
 
 ### Tools for the model
 

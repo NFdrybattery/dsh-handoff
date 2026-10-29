@@ -100,6 +100,8 @@ test('brief is capped and carries the required fields', () => {
   assert.ok(brief.includes('20261029-1705'))
   assert.ok(brief.includes('第一件事：first'))
   assert.ok(brief.includes('HANDOFF.md'))
+  assert.ok(brief.includes('进度：80%'))
+  assert.ok(!brief.includes('undefined'))
 })
 
 test('splitSections returns headings in order', () => {

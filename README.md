@@ -101,7 +101,7 @@ dsh plugin --profile desktop add dsh-handoff
 /handoff resume 20261029-1710-keep-history
 ```
 
-摘要通过 `agent.inject` 放入下一条消息，不唤醒驱动；任务标记为 `resumed` 并写入 `resume-log.jsonl`。同一会话重复执行会提示「已接手」，加 `--force` 可再次注入。
+摘要通过 `agent.inject` 放入下一条消息，不唤醒驱动，所以**执行后不会自动出现回复**：再发一条消息（内容随意），模型就会带着摘要开始。任务标记为 `resumed` 并写入 `resume-log.jsonl`；同一会话重复执行会提示「已接手」，加 `--force` 可再次注入。
 
 ### 模型工具
 

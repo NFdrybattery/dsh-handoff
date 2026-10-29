@@ -6,6 +6,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- `/handoff resume` in a session that already resumed a task now reports that
+  fact instead of failing on an unrelated `draft` row; running it again no
+  longer looks like a broken command.
+- The resume brief no longer renders `undefined` for the progress label, and
+  the success text explains that the brief lands on the next user message
+  rather than starting a turn by itself.
+
 ## [0.1.0] - 2026-10-29
 
 ### Added
