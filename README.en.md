@@ -123,6 +123,20 @@ Override the row in the profile's `cordis.patch.yml`:
 | `remindEverySteps` | `200` | Reminder band interval. |
 | `remindAfterTokens` | `120000` | Context-token reminder; `0` disables. |
 
+### Settings page
+
+After the plugin is installed and enabled, **Settings → Handoff** edits:
+
+- document directory
+- the three reminder thresholds
+- retention days
+- maximum brief characters
+- brief/wake language
+
+Saving uses the Host settings API; some changes take effect after a plugin
+reload. `enabled` is not on the page because disabling the plugin removes the
+page itself; use the plugin manager or profile config for that.
+
 ## Files
 
 ```text

@@ -43,6 +43,16 @@ test('locale metadata relies on the package name instead of a custom title', () 
   }
 })
 
+test('the client half registers a settings section with its settings dependencies', () => {
+  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
+  const inject = manifest.dsh?.client?.inject ?? []
+  assert.ok(inject.includes('@deepseek-ai/dsh-client-ui-settings'))
+  assert.ok(inject.includes('@deepseek-ai/dsh-api-remotes'))
+  const source = readFileSync(join(root, 'lib', 'client.js'), 'utf8')
+  assert.match(source, /settings\.section/)
+  assert.match(source, /remote\.settings/)
+})
+
 test('the manifest declares a client entry that exists', () => {
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
   assert.equal(manifest.dsh?.client?.platform, 'web')

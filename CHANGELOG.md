@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-10-30
+
+### Added
+
+- A Settings → Handoff section for `handoffDir`, reminder thresholds,
+  `retentionDays`, `resumeBriefMaxChars`, and `language`. Values are read and
+  written through the Host settings API; the page shows read-only and missing
+  states. `enabled` stays outside the page because disabling the plugin removes
+  the page itself.
+
 ## [0.6.6] - 2026-10-30
 
 ### Changed

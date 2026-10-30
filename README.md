@@ -105,6 +105,18 @@ dsh plugin --profile desktop remove dsh-handoff
 | `remindEverySteps` | `200` | 提醒分档间隔。 |
 | `remindAfterTokens` | `120000` | 上下文 token 提醒线；`0` 关闭。 |
 
+### 设置页
+
+安装并启用插件后，**设置 → Handoff** 可以编辑：
+
+- 文档目录
+- 三个提醒阈值
+- 任务保留天数
+- 摘要最大字符数
+- 摘要/唤醒语言
+
+保存后的设置走 Host 设置 API；部分设置需要重新加载插件才生效。`enabled` 不放在设置页里，因为关闭插件后这个页面本身也会消失，启停请用插件管理或 profile 配置。
+
 ## 文件
 
 ```text
