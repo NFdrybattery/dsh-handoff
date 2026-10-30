@@ -22,6 +22,21 @@ test('resolveHandoffDir stays inside the workspace', async () => {
   }
 })
 
+test('the default store migrates legacy .dsh/handoff to .dsh/dsh-handoff', async () => {
+  const root = await workspace()
+  try {
+    await mkdir(join(root, '.dsh', 'handoff'), { recursive: true })
+    await writeFile(join(root, '.dsh', 'handoff', 'marker.txt'), 'legacy', 'utf8')
+    const store = new HandoffStore({ cwd: root })
+    await store.init()
+    assert.equal(store.root, resolve(root, '.dsh', 'dsh-handoff'))
+    assert.equal(await readFile(join(root, '.dsh', 'dsh-handoff', 'marker.txt'), 'utf8'), 'legacy')
+    await assert.rejects(readFile(join(root, '.dsh', 'handoff', 'marker.txt'), 'utf8'))
+  } finally {
+    await rm(root, { recursive: true, force: true })
+  }
+})
+
 test('facts, document history, index and resume log round-trip', async () => {
   const root = await workspace()
   try {

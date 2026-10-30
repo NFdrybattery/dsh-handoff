@@ -19,7 +19,7 @@ The package is **dsh-handoff**; the command is still `/handoff`.
 - `/handoff resume` injects a brief; `/handoff resume --latest --wake` also wakes
   the model from the command handler.
 - Tasks expire after one day by default; documents live under
-  `<workspace>/.dsh/handoff/`.
+  `<workspace>/.dsh/dsh-handoff/`.
 
 ## Install
 
@@ -42,7 +42,9 @@ Uninstall:
 dsh plugin --profile desktop remove dsh-handoff
 ```
 
-Documents under `<workspace>/.dsh/handoff/` are left on disk.
+The first run with the new default migrates the old
+`<workspace>/.dsh/handoff/` folder to `<workspace>/.dsh/dsh-handoff/`; existing
+documents move with it.
 
 ## Usage
 
@@ -105,7 +107,7 @@ Override the row in the profile's `cordis.patch.yml`:
 - id: dsh-handoff
   name: dsh-handoff
   config:
-    handoffDir: .dsh/handoff
+    handoffDir: .dsh/dsh-handoff
     retentionDays: 1
     language: zh
 ```
@@ -113,7 +115,7 @@ Override the row in the profile's `cordis.patch.yml`:
 | Key | Default | Meaning |
 | --- | --- | --- |
 | `enabled` | `true` | Master switch. |
-| `handoffDir` | `.dsh/handoff` | Workspace-relative directory. |
+| `handoffDir` | `.dsh/dsh-handoff` | Workspace-relative directory. |
 | `retentionDays` | `1` | Delete task folders not updated for this many days; `0` disables. |
 | `resumeBriefMaxChars` | `2400` | Maximum injected brief length. |
 | `language` | `zh` | `zh` or `en`. |
@@ -124,7 +126,7 @@ Override the row in the profile's `cordis.patch.yml`:
 ## Files
 
 ```text
-<workspace>/.dsh/handoff/
+<workspace>/.dsh/dsh-handoff/
   index.json              task index (metadata)
   <taskId>/HANDOFF.md     the only content file, sections 0–12
 ```

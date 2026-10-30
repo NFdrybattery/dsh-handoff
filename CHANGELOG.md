@@ -4,6 +4,15 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.4] - 2026-10-30
+
+### Changed
+
+- The default storage directory is now `.dsh/dsh-handoff` (previously
+  `.dsh/handoff`). On first use of the default, an existing `.dsh/handoff`
+  directory is renamed to `.dsh/dsh-handoff` so existing documents remain
+  available.
+
 ## [0.6.3] - 2026-10-30
 
 ### Changed

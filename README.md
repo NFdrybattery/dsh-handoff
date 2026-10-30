@@ -12,7 +12,7 @@
 - 第 12 节规定新会话的接手格式：6 个 Markdown 列表项（接手、状态、下一步、关键文件、验证、待确认）。
 - 会话 ⋯ 菜单「交接并继续」：等旧模型写完后自动新建会话，新会话只读文档；命令结果默认收起，不发送长 prompt。
 - `/handoff resume`：手动注摘要；`/handoff resume --latest --wake` 由命令处理器直接唤醒模型。
-- 任务默认 1 天后自动清理；文档在 `<工作区>/.dsh/handoff/`。
+- 任务默认 1 天后自动清理；文档在 `<工作区>/.dsh/dsh-handoff/`。
 
 ## 安装
 
@@ -32,7 +32,7 @@ CLI 只安装包，仍需在 **设置 → 插件** 里选中 `dsh-handoff`（或
 dsh plugin --profile desktop remove dsh-handoff
 ```
 
-已有 `.dsh/handoff/` 文档会保留。
+首次使用新默认目录时，会把旧的 `.dsh/handoff/` 自动迁到 `.dsh/dsh-handoff/`；已有文档随目录一起保留。
 
 ## 用法
 
@@ -89,7 +89,7 @@ dsh plugin --profile desktop remove dsh-handoff
 - id: dsh-handoff
   name: dsh-handoff
   config:
-    handoffDir: .dsh/handoff
+    handoffDir: .dsh/dsh-handoff
     retentionDays: 1
     language: zh
 ```
@@ -97,7 +97,7 @@ dsh plugin --profile desktop remove dsh-handoff
 | 配置 | 默认 | 含义 |
 | --- | --- | --- |
 | `enabled` | `true` | 总开关。 |
-| `handoffDir` | `.dsh/handoff` | 工作区相对目录，必须留在工作区内。 |
+| `handoffDir` | `.dsh/dsh-handoff` | 工作区相对目录，必须留在工作区内。 |
 | `retentionDays` | `1` | 超过这么多天未更新的任务目录自动删除；`0` 关闭。 |
 | `resumeBriefMaxChars` | `2400` | 接续摘要最大字符数。 |
 | `language` | `zh` | `zh` 或 `en`。 |
@@ -108,7 +108,7 @@ dsh plugin --profile desktop remove dsh-handoff
 ## 文件
 
 ```text
-<工作区>/.dsh/handoff/
+<工作区>/.dsh/dsh-handoff/
   index.json              任务索引（元数据）
   <taskId>/HANDOFF.md     唯一内容文件，含 0–12 节
 ```
