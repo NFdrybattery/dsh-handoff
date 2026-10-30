@@ -1,6 +1,6 @@
 {
-  "name": "handoff",
-  "version": "0.6.2",
+  "name": "dsh-handoff",
+  "version": "0.6.3",
   "description": "DeepSeek Harness plugin: write a workspace handoff document from a long session, then resume the work in a fresh session without re-discovering context.",
   "keywords": [
     "deepseek-harness",

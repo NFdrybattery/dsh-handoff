@@ -1,8 +1,8 @@
-# Handoff
+# dsh-handoff
 
 把长会话交给新会话：旧会话模型写一份 `HANDOFF.md`，新会话只读这份文档继续。
 
-包名是 **handoff**，命令仍是 `/handoff`。
+包名是 **dsh-handoff**，命令仍是 `/handoff`。
 
 [English](README.en.md)
 
@@ -18,18 +18,18 @@
 
 需要 DeepSeek Harness `0.2.1-rc.x`，Node.js `^22.19.0 || >=24.0.0`。
 
-在 **设置 → 插件** 里从本地目录安装这个 checkout，选中 `handoff`，然后重启。CLI 备选：
+在 **设置 → 插件** 里从本地目录安装这个 checkout，选中 `dsh-handoff`，然后重启。CLI 备选：
 
 ```powershell
 dsh plugin --profile desktop add link:D:\path\to\dsh-handoff
 ```
 
-CLI 只安装包，仍需在 **设置 → 插件** 里选中 `handoff`（或写入 profile 的 `dsh.profile.bundles`）再重启。其他 profile 把 `desktop` 换成对应名称。
+CLI 只安装包，仍需在 **设置 → 插件** 里选中 `dsh-handoff`（或写入 profile 的 `dsh.profile.bundles`）再重启。其他 profile 把 `desktop` 换成对应名称。
 
-卸载：**设置 → 插件** 移除 `handoff`，或：
+卸载：**设置 → 插件** 移除 `dsh-handoff`，或：
 
 ```powershell
-dsh plugin --profile desktop remove handoff
+dsh plugin --profile desktop remove dsh-handoff
 ```
 
 已有 `.dsh/handoff/` 文档会保留。
@@ -86,8 +86,8 @@ dsh plugin --profile desktop remove handoff
 在 profile 的 `cordis.patch.yml` 里按 id 覆盖：
 
 ```yaml
-- id: handoff
-  name: handoff
+- id: dsh-handoff
+  name: dsh-handoff
   config:
     handoffDir: .dsh/handoff
     retentionDays: 1

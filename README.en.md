@@ -1,9 +1,9 @@
-# Handoff
+# dsh-handoff
 
 Hand a long Session to a fresh one: the old Session's model writes `HANDOFF.md`,
 and the new Session continues from that document alone.
 
-The package is **handoff**; the command is still `/handoff`.
+The package is **dsh-handoff**; the command is still `/handoff`.
 
 [Chinese](README.md)
 
@@ -26,20 +26,20 @@ The package is **handoff**; the command is still `/handoff`.
 Requires DeepSeek Harness `0.2.1-rc.x` and Node.js `^22.19.0 || >=24.0.0`.
 
 In **Settings → Plugins**, install a bundle from this local checkout, select
-`handoff`, and restart. CLI alternative:
+`dsh-handoff`, and restart. CLI alternative:
 
 ```powershell
 dsh plugin --profile desktop add link:D:\path\to\dsh-handoff
 ```
 
-The CLI only installs the package; still select `handoff` in
+The CLI only installs the package; still select `dsh-handoff` in
 **Settings → Plugins** (or add it to the profile's `dsh.profile.bundles`) and
 restart.
 
 Uninstall:
 
 ```powershell
-dsh plugin --profile desktop remove handoff
+dsh plugin --profile desktop remove dsh-handoff
 ```
 
 Documents under `<workspace>/.dsh/handoff/` are left on disk.
@@ -102,8 +102,8 @@ The document stays on disk but is no longer a resume candidate.
 Override the row in the profile's `cordis.patch.yml`:
 
 ```yaml
-- id: handoff
-  name: handoff
+- id: dsh-handoff
+  name: dsh-handoff
   config:
     handoffDir: .dsh/handoff
     retentionDays: 1
