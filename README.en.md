@@ -107,7 +107,6 @@ Override the row in the profile's `cordis.patch.yml`:
 - id: dsh-handoff
   name: dsh-handoff
   config:
-    handoffDir: .dsh/dsh-handoff
     retentionDays: 1
     language: zh
 ```
@@ -115,7 +114,6 @@ Override the row in the profile's `cordis.patch.yml`:
 | Key | Default | Meaning |
 | --- | --- | --- |
 | `enabled` | `true` | Master switch. |
-| `handoffDir` | `.dsh/dsh-handoff` | Workspace-relative directory. |
 | `retentionDays` | `1` | Delete task folders not updated for this many days; `0` disables. |
 | `resumeBriefMaxChars` | `2400` | Maximum injected brief length. |
 | `language` | `zh` | `zh` or `en`. |
@@ -127,7 +125,6 @@ Override the row in the profile's `cordis.patch.yml`:
 
 After the plugin is installed and enabled, **Settings → Handoff** edits:
 
-- document directory
 - the three reminder thresholds
 - retention days
 - maximum brief characters

@@ -89,7 +89,6 @@ dsh plugin --profile desktop remove dsh-handoff
 - id: dsh-handoff
   name: dsh-handoff
   config:
-    handoffDir: .dsh/dsh-handoff
     retentionDays: 1
     language: zh
 ```
@@ -97,7 +96,6 @@ dsh plugin --profile desktop remove dsh-handoff
 | 配置 | 默认 | 含义 |
 | --- | --- | --- |
 | `enabled` | `true` | 总开关。 |
-| `handoffDir` | `.dsh/dsh-handoff` | 工作区相对目录，必须留在工作区内。 |
 | `retentionDays` | `1` | 超过这么多天未更新的任务目录自动删除；`0` 关闭。 |
 | `resumeBriefMaxChars` | `2400` | 接续摘要最大字符数。 |
 | `language` | `zh` | `zh` 或 `en`。 |
@@ -109,7 +107,6 @@ dsh plugin --profile desktop remove dsh-handoff
 
 安装并启用插件后，**设置 → Handoff** 可以编辑：
 
-- 文档目录
 - 三个提醒阈值
 - 任务保留天数
 - 摘要最大字符数
