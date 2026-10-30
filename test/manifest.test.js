@@ -35,6 +35,14 @@ test('the manifest and bundle patch use the dsh-handoff name', () => {
   assert.match(patch, /name:\s*'dsh-handoff'/)
 })
 
+test('locale metadata relies on the package name instead of a custom title', () => {
+  for (const locale of ['en', 'zh']) {
+    const meta = JSON.parse(readFileSync(join(root, 'locale', `${locale}.json`), 'utf8'))
+    assert.equal(meta.meta?.title, undefined)
+    assert.equal(typeof meta.meta?.description, 'string')
+  }
+})
+
 test('the manifest declares a client entry that exists', () => {
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
   assert.equal(manifest.dsh?.client?.platform, 'web')
