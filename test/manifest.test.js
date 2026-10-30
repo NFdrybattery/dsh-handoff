@@ -27,12 +27,12 @@ test('the manifest declares a Host bundle patch that exists', () => {
   for (const file of files) assert.ok(existsSync(join(root, file)), `missing bundle patch file: ${file}`)
 })
 
-test('the manifest and bundle patch use the handover name', () => {
+test('the manifest and bundle patch use the handoff name', () => {
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
-  assert.equal(manifest.name, 'handover')
+  assert.equal(manifest.name, 'handoff')
   const patch = readFileSync(join(root, 'cordis.patch.yml'), 'utf8')
-  assert.match(patch, /id:\s*handover/)
-  assert.match(patch, /name:\s*'handover'/)
+  assert.match(patch, /id:\s*handoff/)
+  assert.match(patch, /name:\s*'handoff'/)
 })
 
 test('the manifest declares a client entry that exists', () => {
