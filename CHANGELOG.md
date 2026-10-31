@@ -4,6 +4,22 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.2] - 2026-10-31
+
+### Fixed
+
+- Mark every Config field `.volatile()`. The Host Settings service only
+  projects a form for a plugin whose Config contains a volatile field; without
+  that metadata the settings page received no namespace and showed the red
+  "no settings entry" error. Also unwrap volatile `{ get() }` refs in the Host
+  and client resolvers.
+
+### Changed
+
+- Icon refinement: increase the vertical offset of the second document, use a
+  white rounded right-angle arrow that stops before the frame, and simplify the
+  two-document menu icon.
+
 ## [0.8.1] - 2026-10-31
 
 ### Changed
