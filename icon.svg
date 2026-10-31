@@ -1,16 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" role="img" aria-label="dsh-handoff">
   <defs>
-    <linearGradient id="handoff-bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#4f46e5"/>
-      <stop offset="1" stop-color="#0ea5e9"/>
+    <linearGradient id="dsh-handoff-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4F46E5"/>
+      <stop offset="1" stop-color="#0EA5E9"/>
     </linearGradient>
   </defs>
-  <rect width="96" height="96" rx="22" fill="url(#handoff-bg)"/>
-  <g fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="17" y="23" width="27" height="35" rx="6" stroke-width="4" opacity="0.9"/>
-    <rect x="52" y="38" width="27" height="35" rx="6" stroke-width="4" opacity="0.9"/>
-    <path d="M36 47h26" stroke-width="5"/>
-    <path d="M54 39l9 8-9 8" stroke-width="5"/>
+  <rect width="96" height="96" rx="22" fill="url(#dsh-handoff-bg)"/>
+  <g fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="14" y="16" width="33" height="42" rx="8" stroke-width="4.5"/>
+    <path d="M23 29h16M23 37h13M23 45h9" stroke-width="3.5" opacity="0.9"/>
+    <rect x="55" y="33" width="27" height="38" rx="7" stroke-width="4.5"/>
   </g>
-  <path d="M24 32h13M24 40h9" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.55"/>
+  <path d="M30 58v8c0 2.2 1.8 4 4 4h12" fill="none" stroke="#D7E3FF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M46 65l6 5-6 5z" fill="#D7E3FF"/>
 </svg>

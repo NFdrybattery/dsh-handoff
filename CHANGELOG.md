@@ -4,6 +4,17 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.1] - 2026-10-31
+
+### Changed
+
+- The takeover prompt now asks for a full document read and project-file review,
+  without emphasizing the recent-rounds section; the old Session may be read
+  when necessary.
+- Redesign the plugin icon as an indigo tile with two documents and a right-angle
+  arrow, and simplify the ⋯ menu icon to the same two-document elbow-arrow form
+  for legibility at 14px.
+
 ## [0.8.0] - 2026-10-31
 
 ### Changed
