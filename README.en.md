@@ -11,8 +11,8 @@ The package is **dsh-handoff**; the command is still `/handoff`.
 
 - `/handoff` sends a handoff instruction to the current Session; the model writes
   `HANDOFF.md` in 13 sections (0–12).
-- Section 12 defines the takeover reply: six Markdown list items (takeover,
-  state, next, key files, verification, confirmation).
+- Section 12 records the most recent user/assistant rounds so the new Session
+  can understand recent context; `recentRounds` defaults to 5.
 - **Handoff and continue** in the Session **⋯** menu waits for the old model,
   creates a new Session, and reads only the document. The command result is a
   collapsed card instead of a long prompt.
@@ -60,9 +60,9 @@ documents move with it.
 document is ready only after that model turn finishes. `/handoff update` is the
 same action, `/handoff --new` starts another task line.
 
-Sections 0–11 are the handoff; section 12 is the takeover format. The
-instruction requires real content in every section and facts from the current
-Session.
+Sections 0–11 are the handoff; section 12 records the most recent user/assistant
+rounds. The instruction requires real content in every section and facts from
+the current Session.
 
 ### One-click handoff
 
@@ -70,8 +70,9 @@ Session list **⋯** → **Handoff and continue**:
 
 1. the old model writes `HANDOFF.md`;
 2. the turn is allowed to finish (up to 4 minutes);
-3. the new Session runs `/handoff resume --latest --wake`, reads the document,
-   and replies with six list items.
+3. the new Session runs `/handoff resume --latest --wake`, reads the document
+   (including recent rounds), reviews the project files, and gives a concise
+   takeover summary.
 
 The first reply does not run commands or modify files.
 
@@ -115,6 +116,7 @@ Override the row in the profile's `cordis.patch.yml`:
 | --- | --- | --- |
 | `enabled` | `true` | Master switch. |
 | `retentionDays` | `1` | Delete task folders not updated for this many days; `0` disables. |
+| `recentRounds` | `5` | Recent rounds embedded in the handoff; `0` disables the section. |
 | `resumeBriefMaxChars` | `2400` | Maximum injected brief length. |
 | `language` | `zh` | `zh` or `en`. |
 | `remindAfterSteps` | `800` | First step reminder. |
@@ -127,6 +129,7 @@ After the plugin is installed and enabled, **Settings → Handoff** edits:
 
 - the three reminder thresholds
 - retention days
+- recent rounds
 - maximum brief characters
 - brief/wake language
 

@@ -9,7 +9,7 @@
 ## 功能
 
 - `/handoff`：在旧会话后台发送交接指令，由当前模型按 0–12 共 13 节写出 `HANDOFF.md`。
-- 第 12 节规定新会话的接手格式：6 个 Markdown 列表项（接手、状态、下一步、关键文件、验证、待确认）。
+- 第 12 节收录最近几轮用户输入与助手输出，方便新会话理解近期上下文；轮数由 `recentRounds` 配置，默认 5。
 - 会话 ⋯ 菜单「交接并继续」：等旧模型写完后自动新建会话，新会话只读文档；命令结果默认收起，不发送长 prompt。
 - `/handoff resume`：手动注摘要；`/handoff resume --latest --wake` 由命令处理器直接唤醒模型。
 - 任务默认 1 天后自动清理；文档在 `<工作区>/.dsh/dsh-handoff/`。
@@ -46,7 +46,7 @@ dsh plugin --profile desktop remove dsh-handoff
 
 `/handoff` 只建目录并向当前模型发送带格式要求的指令；文档要等这一轮模型结束才可用。`/handoff update` 是同一动作，`/handoff --new` 新开一条任务线。
 
-文档 0–11 节是交接内容，第 12 节是接手回复格式。每节都有内容要求，不允许只写标题；事实必须来自当前会话。
+文档 0–11 节是交接内容，第 12 节是最近几轮用户输入与助手输出。每节都有内容要求，不允许只写标题；事实必须来自当前会话。
 
 ### 一键交接
 
@@ -54,7 +54,7 @@ dsh plugin --profile desktop remove dsh-handoff
 
 1. 旧会话模型开始写 `HANDOFF.md`；
 2. 等这一轮结束（最多 4 分钟）；
-3. 新会话执行 `/handoff resume --latest --wake`，命令结果收起，模型读取文档后回 6 个列表项。
+3. 新会话执行 `/handoff resume --latest --wake`，命令结果收起，模型读取文档并结合项目文件梳理前期工作，给出简要接手总结。
 
 新会话第一轮不执行命令、不改文件；确认后再继续。
 
@@ -97,6 +97,7 @@ dsh plugin --profile desktop remove dsh-handoff
 | --- | --- | --- |
 | `enabled` | `true` | 总开关。 |
 | `retentionDays` | `1` | 超过这么多天未更新的任务目录自动删除；`0` 关闭。 |
+| `recentRounds` | `5` | 写入交接文档的最近对话轮数；`0` 关闭该节。 |
 | `resumeBriefMaxChars` | `2400` | 接续摘要最大字符数。 |
 | `language` | `zh` | `zh` 或 `en`。 |
 | `remindAfterSteps` | `800` | 首次提醒步数。 |
@@ -109,6 +110,7 @@ dsh plugin --profile desktop remove dsh-handoff
 
 - 三个提醒阈值
 - 任务保留天数
+- 最近对话轮数
 - 摘要最大字符数
 - 摘要/唤醒语言
 

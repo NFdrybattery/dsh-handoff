@@ -4,6 +4,24 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2026-10-31
+
+### Changed
+
+- Replace section 12's takeover reply template with a recent-rounds section:
+  the last N user inputs and assistant outputs in UI order.
+- Add `recentRounds` (default 5, 0 disables the section) to config, the settings
+  page, and the handoff instruction. The plugin passes the extracted rounds to
+  the old model, which writes them into section 12.
+- The wake/fallback prompt now asks the new Session to read the document and
+  project files, then give a concise summary of the earlier work and next steps;
+  the fixed six-item reply format is gone.
+
+### Fixed
+
+- The Settings page now finds the Host settings namespace by either the patch
+  id or the `include:` entry id, and the profile has a real config row.
+
 ## [0.7.1] - 2026-10-30
 
 ### Fixed
