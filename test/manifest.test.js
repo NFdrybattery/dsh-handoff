@@ -65,3 +65,18 @@ test('every module the host entry imports exists', () => {
   assert.ok(relatives.length > 0, 'expected relative imports in lib/index.js')
   for (const relative of relatives) assert.ok(existsSync(join(root, 'lib', relative)), `missing module: ${relative}`)
 })
+
+test('the manifest declares a readable top-level icon', () => {
+  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
+  assert.equal(
+    typeof manifest.icon,
+    'string',
+    'the plugin manager reads the top-level icon before the ./icon export',
+  )
+  assert.match(manifest.icon, /\.(svg|png|jpe?g|webp)$/i, 'the host only accepts svg/png/jpeg/webp icons')
+  const iconPath = join(root, manifest.icon)
+  assert.ok(existsSync(iconPath), `icon file is missing: ${manifest.icon}`)
+  const bytes = readFileSync(iconPath)
+  assert.ok(bytes.length > 0, 'icon file is empty')
+  assert.ok(bytes.length <= 256 * 1024, 'icon must stay within the 256 KiB host limit')
+})

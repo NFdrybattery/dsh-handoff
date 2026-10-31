@@ -4,6 +4,29 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.3] - 2026-10-31
+
+### Changed
+
+- Section 12 is now a verbatim transcript of the last `recentRounds` user
+  rounds: the plugin copies the Session display text into `用户：…` / `回复：…`
+  lines and the old model must transcribe it without summarizing, rewriting,
+  compressing or reordering. The per-message 1200-character clip is gone, and
+  the transcript is read from the Session log instead of the projection, whose
+  message text was clamped when it was folded.
+- The plugin icon is two equal, partially overlapping rounded rectangles with no
+  arrow, and the manifest declares a top-level `icon` that the plugin manager
+  reads directly.
+
+### Fixed
+
+- The plugin card kept the old artwork because the manifest declared no
+  top-level `icon`: only a root `icon` in `package.json` is read for the card;
+  the exported `./icon` subpath alone is not used.
+- The resume fallback prompt now points at `.dsh/dsh-handoff/` instead of the
+  migrated legacy `.dsh/handoff/`, so a takeover can still find the newest
+  `HANDOFF.md` when the resume brief is missing.
+
 ## [0.8.2] - 2026-10-31
 
 ### Fixed

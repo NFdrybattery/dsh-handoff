@@ -11,8 +11,9 @@ The package is **dsh-handoff**; the command is still `/handoff`.
 
 - `/handoff` sends a handoff instruction to the current Session; the model writes
   `HANDOFF.md` in 13 sections (0–12).
-- Section 12 records the most recent user/assistant rounds so the new Session
-  can understand recent context; `recentRounds` defaults to 5.
+- Section 12 copies the most recent user/assistant rounds verbatim, as `用户：` /
+  `回复：` lines, so the new Session sees the displayed conversation itself, not a
+  summary; `recentRounds` defaults to 5.
 - **Handoff and continue** in the Session **⋯** menu waits for the old model,
   creates a new Session, and reads only the document. The command result is a
   collapsed card instead of a long prompt.
@@ -60,9 +61,9 @@ documents move with it.
 document is ready only after that model turn finishes. `/handoff update` is the
 same action, `/handoff --new` starts another task line.
 
-Sections 0–11 are the handoff; section 12 records the most recent user/assistant
-rounds. The instruction requires real content in every section and facts from
-the current Session.
+Sections 0–11 are the handoff; section 12 is a verbatim transcript of the most
+recent rounds. Section 12 is not summarized, while the other sections are; every
+section still needs real content, and facts come from the current Session.
 
 ### One-click handoff
 

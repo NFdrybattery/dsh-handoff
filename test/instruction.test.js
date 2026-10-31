@@ -14,7 +14,7 @@ test('handoff instruction carries frontmatter, all 13 sections and content rules
     turns: 8,
     docPath: 'D:\\41_Agent\\50_Deepseek\\.dsh\\dsh-handoff\\20261029-1957-dsh-handover\\HANDOFF.md',
     recentRounds: 5,
-    recentDialog: '[用户 seq=1] 请实现交接插件\n\n[助手 seq=2] 已完成初版',
+    recentDialog: '用户：请实现交接插件\n\n回复：已完成初版',
   })
 
   assert.ok(text.includes('task_id: "20261029-1957-dsh-handover"'))
@@ -28,7 +28,11 @@ test('handoff instruction carries frontmatter, all 13 sections and content rules
   }
   assert.ok(text.includes('## 12. 最近几轮对话'))
   assert.ok(text.includes('最近 5 轮'))
-  assert.ok(text.includes('[用户 seq=1] 请实现交接插件'))
+  assert.ok(text.includes('用户：请实现交接插件'))
+  assert.ok(text.includes('回复：已完成初版'))
+  assert.ok(text.includes('原样抄录'))
+  assert.ok(text.includes('禁止总结、改写、压缩、合并、截断或重排'))
+  assert.ok(text.includes('第 12 节只做原样转录'))
   assert.ok(!text.includes('【接手】<taskId'))
   assert.ok(text.includes('每一节都要写实际内容，不能只有标题'))
   assert.ok(text.includes('不要把“改过文件”当成“已完成”'))

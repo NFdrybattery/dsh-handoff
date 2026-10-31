@@ -96,8 +96,8 @@ test('brief is capped and carries the required fields', () => {
     },
     facts: { asOfSeq: 42, session: { steps: 812, turns: 96 } },
     narrative: { status_now: 'Core done', progress: '80%', next: ['first', 'second', 'third'] },
-    docPath: 'C:\\ws\\.dsh\\handoff\\20261029-1705\\HANDOFF.md',
-    factsPath: 'C:\\ws\\.dsh\\handoff\\20261029-1705\\facts.json',
+    docPath: 'C:\\ws\\.dsh\\dsh-handoff\\20261029-1705\\HANDOFF.md',
+    factsPath: 'C:\\ws\\.dsh\\dsh-handoff\\20261029-1705\\facts.json',
     maxChars: 2400,
     language: 'zh',
   })
